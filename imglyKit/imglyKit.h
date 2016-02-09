@@ -11,4 +11,7 @@
 FOUNDATION_EXPORT double imglyKitVersionNumber;
 FOUNDATION_EXPORT const unsigned char imglyKitVersionString[];
 
+#import <imglyKit/IMGLYPhotoEditModel.h>
+#import <imglyKit/IMGLYPhotoEditMutableModel.h>
+#import <imglyKit/IMGLYRenderMode.h>
 #import <imglyKit/LUTToNSDataConverter.h>

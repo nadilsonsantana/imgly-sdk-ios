@@ -17,7 +17,7 @@ public extension NSImage {
         let cgImage = CGImageForProposedRect(nil, context: nil, hints: nil)
         return cgImage
     }
-    // swiftlint:enable variable?name
+    // swiftlint:enable variable_name
 }
 
 #endif

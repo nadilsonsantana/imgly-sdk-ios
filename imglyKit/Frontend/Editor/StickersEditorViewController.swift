@@ -321,7 +321,7 @@ let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
         case .Began:
             draggedView = hitImageView(location)
             if let draggedView = draggedView {
-                unSelectView(selectedView)
+                deselectView(selectedView)
                 selectedView = draggedView
                 selectView(selectedView)
             }
@@ -351,7 +351,7 @@ let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
                     draggedView = hitImageView(midpoint)
                 }
                 if let draggedView = draggedView {
-                    unSelectView(selectedView)
+                    deselectView(selectedView)
                     selectedView = draggedView
                     selectView(selectedView)
                 }
@@ -382,7 +382,7 @@ let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
                     draggedView = hitImageView(midpoint)
                 }
                 if let draggedView = draggedView {
-                    unSelectView(selectedView)
+                    deselectView(selectedView)
                     selectedView = draggedView
                     selectView(selectedView)
                     updateButtonStatus()
@@ -404,7 +404,7 @@ let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
     @objc private func handleTap(recognizer: UITapGestureRecognizer) {
         let location = recognizer.locationInView(stickersClipView)
         draggedView = hitImageView(location)
-        unSelectView(selectedView)
+        deselectView(selectedView)
         if let draggedView = draggedView {
             selectedView = draggedView
             selectView(selectedView)
@@ -525,7 +525,7 @@ let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
         imageView.layer.borderWidth = 1.0
     }
 
-    private func unSelectView(imageView: UIImageView) {
+    private func deselectView(imageView: UIImageView) {
         imageView.layer.borderWidth = 0
     }
 
@@ -580,7 +580,7 @@ extension StickersEditorViewController: UICollectionViewDataSource {
 extension StickersEditorViewController: UICollectionViewDelegate {
     // add selected sticker
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        unSelectView(selectedView)
+        deselectView(selectedView)
 
         let sticker = options.stickersDataSource.stickerAtIndex(indexPath.item)
         let imageView = StickerImageView(image: sticker.image)

@@ -235,13 +235,12 @@
 		2B91DF071C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF031C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m */; };
 		2B91DF0A1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */; };
 		2B91DF0B1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */; };
-		2B948C351C5B6A0900094CAE /* CGAffineTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */; };
 		2B948C361C5B6A0900094CAE /* CGAffineTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */; };
 		2B9F75F21C68A38400E5723B /* PhotoEditRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */; };
 		2B9F75F31C68A38400E5723B /* PhotoEditRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */; };
-		2BA5DB9E1C562FDC0038570A /* CropRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA5DB9D1C562FDC0038570A /* CropRatio.swift */; };
 		2B9F75F51C68AC4300E5723B /* IMGLYRenderMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2B9F75F61C68AC4300E5723B /* IMGLYRenderMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2BA5DB9E1C562FDC0038570A /* CropRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA5DB9D1C562FDC0038570A /* CropRatio.swift */; };
 		2BA980601C493FE7001C85B6 /* VideoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BA9805F1C493FE7001C85B6 /* VideoController.swift */; };
 		2BB88C3E1B69127400D23A2F /* ScaleFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB88C3D1B69127400D23A2F /* ScaleFilter.swift */; };
 		2BB88C3F1B69127400D23A2F /* ScaleFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB88C3D1B69127400D23A2F /* ScaleFilter.swift */; };
@@ -541,9 +540,9 @@
 		2B91DF081C64FAD400B559D3 /* IMGLYPhotoEditModel+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMGLYPhotoEditModel+Private.h"; sourceTree = "<group>"; };
 		2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IMGLYOrientation.swift; sourceTree = "<group>"; };
 		2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGAffineTransformExtension.swift; sourceTree = "<group>"; };
-		2BA5DB9D1C562FDC0038570A /* CropRatio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropRatio.swift; sourceTree = "<group>"; };
 		2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEditRenderer.swift; sourceTree = "<group>"; };
 		2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMGLYRenderMode.h; sourceTree = "<group>"; };
+		2BA5DB9D1C562FDC0038570A /* CropRatio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropRatio.swift; sourceTree = "<group>"; };
 		2BA9805F1C493FE7001C85B6 /* VideoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoController.swift; sourceTree = "<group>"; };
 		2BB88C3D1B69127400D23A2F /* ScaleFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScaleFilter.swift; sourceTree = "<group>"; };
 		2BBE166B1C4E44FA00921DE7 /* FocusController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusController.swift; sourceTree = "<group>"; };

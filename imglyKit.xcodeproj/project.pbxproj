@@ -215,6 +215,8 @@
 		2B1B9AF61C52625100C6D276 /* CGVectorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */; };
 		2B1B9AF81C52848700C6D276 /* TextLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B9AF71C52848700C6D276 /* TextLabel.swift */; };
 		2B319B651C45070200515C9D /* FlashController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B319B641C45070200515C9D /* FlashController.swift */; };
+		2B4509A51C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */; };
+		2B4509A61C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */; };
 		2B50239E1C286B0400CE9AD3 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50239D1C286B0400CE9AD3 /* Filter.swift */; };
 		2B54A0A01C2AEA6100E82DC6 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50239D1C286B0400CE9AD3 /* Filter.swift */; };
 		2B5728061C28594E0003EF8F /* EffectFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B5728051C28594E0003EF8F /* EffectFilter.swift */; };
@@ -526,6 +528,7 @@
 		2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGVectorExtension.swift; sourceTree = "<group>"; };
 		2B1B9AF71C52848700C6D276 /* TextLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLabel.swift; sourceTree = "<group>"; };
 		2B319B641C45070200515C9D /* FlashController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlashController.swift; sourceTree = "<group>"; };
+		2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEffect.swift; sourceTree = "<group>"; };
 		2B50239D1C286B0400CE9AD3 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		2B5728051C28594E0003EF8F /* EffectFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EffectFilter.swift; sourceTree = "<group>"; };
 		2B5CA32D1C490CD80065DE48 /* CameraViewControllerOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewControllerOptions.swift; sourceTree = "<group>"; };
@@ -943,6 +946,7 @@
 				2B91DF031C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m */,
 				2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */,
 				2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */,
+				2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";
@@ -1767,6 +1771,7 @@
 				2B1ADA9F1B19C8EE00C98522 /* BleachedBlueFilter.swift in Sources */,
 				2B1ADA941B19C8E500C98522 /* NoneFilter.swift in Sources */,
 				2B91DF0B1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */,
+				2B4509A61C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */,
 				2B1ADABE1B19C8EE00C98522 /* LeninFilter.swift in Sources */,
 				2B91DF011C64EEC900B559D3 /* IMGLYPhotoEditModel.m in Sources */,
 				2B1ADAD21B19C8EE00C98522 /* SepiaHighFilter.swift in Sources */,
@@ -1812,6 +1817,7 @@
 				2BF4D3E51AF1150500C801B2 /* StickerCollectionViewCell.swift in Sources */,
 				2BF4D3E71AF1150500C801B2 /* StickersEditorViewController.swift in Sources */,
 				2BF4D5431AF1159D00C801B2 /* FontImporter.swift in Sources */,
+				2B4509A51C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */,
 				2BF4D5351AF1155E00C801B2 /* SunsetFilter.swift in Sources */,
 				2BF4D4B21AF1154B00C801B2 /* TiltshiftFilter.swift in Sources */,
 				09D214CE1C4C043C008D20F6 /* OverlayConverter.swift in Sources */,

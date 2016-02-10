@@ -117,6 +117,15 @@ import CoreImage
         return editedImage
     }
 
+    public var outputImageSize: CGSize {
+        // Preconditions
+        guard let originalImage = originalImage else {
+            fatalError("originalImage cannot be nil while rendering")
+        }
+
+        return editedGeometryImageWithBaseImage(originalImage).extent.size
+    }
+
     private func editedGeometryImageWithBaseImage(inputImage: CIImage) -> CIImage {
         // Preconditions
         guard let photoEditModel = photoEditModel else {
@@ -177,4 +186,52 @@ import CoreImage
         effectFilter = nil
         cachedOutputImage = nil
     }
+
+    private var generatingCIContext: CIContext?
+
+    private func newCGImageFromOutputCIImage(outputImage: CIImage) -> CGImage {
+        if generatingCIContext == nil {
+            generatingCIContext = CIContext(EAGLContext: EAGLContext(API: .OpenGLES2))
+        }
+
+        guard let generatingCIContext = generatingCIContext else {
+            fatalError("Unable to initialize CIContext")
+        }
+
+        return generatingCIContext.createCGImage(outputImage, fromRect: outputImage.extent)
+    }
+
+    public func newOutputImage() -> CGImage {
+        return newCGImageFromOutputCIImage(outputImage)
+    }
+
+    public func createOutputImageWithCompletion(completion: ((outputImage: CGImage) -> Void)?) {
+        dispatch_async(renderingQueue) {
+            let image = self.newCGImageFromOutputCIImage(self.outputImage)
+            completion?(outputImage: image)
+        }
+    }
+
+    private var drawingCIContext: CIContext?
+    private var lastUsedEAGLContext: EAGLContext?
+
+    public func drawOutputImageInContext(context: EAGLContext, inRect rect: CGRect, viewportWidth: Int, viewportHeight: Int) {
+        glClearColor(0, 0, 0, 1.0)
+        glViewport(0, 0, GLsizei(viewportWidth), GLsizei(viewportHeight))
+        glClear(GLbitfield(GL_COLOR_BUFFER_BIT))
+
+        let outputImage = self.outputImage
+
+        if drawingCIContext == nil || lastUsedEAGLContext != context {
+            drawingCIContext = CIContext(EAGLContext: context)
+            lastUsedEAGLContext = context
+        }
+
+        guard let drawingCIContext = drawingCIContext else {
+            fatalError("Unable to initialize CIContext")
+        }
+
+        drawingCIContext.drawImage(outputImage, inRect: rect, fromRect: CGRect(origin: CGPoint.zero, size: outputImage.extent.size))
+    }
+
 }

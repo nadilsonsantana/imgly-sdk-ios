@@ -258,6 +258,7 @@
 		2BC537991C513A3200A7DE17 /* SliderEditorViewControllerOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC537981C513A3200A7DE17 /* SliderEditorViewControllerOptions.swift */; };
 		2BC5379B1C513A3900A7DE17 /* TextEditorViewControllerOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC5379A1C513A3900A7DE17 /* TextEditorViewControllerOptions.swift */; };
 		2BC5379D1C513AA500A7DE17 /* EditorViewControllerOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC5379C1C513AA500A7DE17 /* EditorViewControllerOptions.swift */; };
+		2BC5A5271C6A323600C03C82 /* PhotoEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC5A5261C6A323600C03C82 /* PhotoEditViewController.swift */; };
 		2BE0C44F1C3ABB3B00F1F5E4 /* imglyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BF4D3841AF1139600C801B2 /* imglyKit.framework */; };
 		2BE0C4571C3ABBA900F1F5E4 /* LUTConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE0C4561C3ABBA900F1F5E4 /* LUTConverterTests.swift */; };
 		2BE37B781B3D9978009FAD40 /* VideoRecordButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE37B771B3D9978009FAD40 /* VideoRecordButton.swift */; };
@@ -558,6 +559,7 @@
 		2BC537981C513A3200A7DE17 /* SliderEditorViewControllerOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SliderEditorViewControllerOptions.swift; sourceTree = "<group>"; };
 		2BC5379A1C513A3900A7DE17 /* TextEditorViewControllerOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextEditorViewControllerOptions.swift; sourceTree = "<group>"; };
 		2BC5379C1C513AA500A7DE17 /* EditorViewControllerOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorViewControllerOptions.swift; sourceTree = "<group>"; };
+		2BC5A5261C6A323600C03C82 /* PhotoEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEditViewController.swift; sourceTree = "<group>"; };
 		2BE0C44A1C3ABB3B00F1F5E4 /* imglyKit iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "imglyKit iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BE0C44E1C3ABB3B00F1F5E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2BE0C4561C3ABBA900F1F5E4 /* LUTConverterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LUTConverterTests.swift; sourceTree = "<group>"; };
@@ -964,6 +966,13 @@
 			path = Options;
 			sourceTree = "<group>";
 		};
+		2BC5A5251C6A31F500C03C82 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
 		2BE0C4551C3ABB4600F1F5E4 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1060,6 +1069,7 @@
 				2BF4D3C21AF1150400C801B2 /* OrientationEditorViewController.swift */,
 				09D214CD1C4C043C008D20F6 /* OverlayConverter.swift */,
 				097A45D51C5A595100B2D45F /* PathHelper.swift */,
+				2BC5A5261C6A323600C03C82 /* PhotoEditViewController.swift */,
 				2BF4D3C31AF1150400C801B2 /* SaturationEditorViewController.swift */,
 				2BF4D3C41AF1150400C801B2 /* SliderEditorViewController.swift */,
 				2BF4D3C51AF1150400C801B2 /* Sticker.swift */,
@@ -1070,6 +1080,7 @@
 				09C2BB811C63A5C0009D0F23 /* TextCaptionButton.swift */,
 				2BF4D3CB1AF1150400C801B2 /* TextEditorViewController.swift */,
 				2B1B9AF71C52848700C6D276 /* TextLabel.swift */,
+				2BC5A5251C6A31F500C03C82 /* Tools */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -1937,6 +1948,7 @@
 				2BF4D5251AF1155E00C801B2 /* PitchedFilter.swift in Sources */,
 				2BF4D53A1AF1155E00C801B2 /* X400Filter.swift in Sources */,
 				2BF4D3E61AF1150500C801B2 /* StickersDataSource.swift in Sources */,
+				2BC5A5271C6A323600C03C82 /* PhotoEditViewController.swift in Sources */,
 				2BF4D4AD1AF1154B00C801B2 /* NoneFilter.swift in Sources */,
 				2BF4D4AC1AF1154B00C801B2 /* FixedFilterStack.swift in Sources */,
 				2BF4D5131AF1155E00C801B2 /* HighcarbFilter.swift in Sources */,

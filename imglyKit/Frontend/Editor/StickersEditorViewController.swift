@@ -417,7 +417,7 @@ let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
 
     @objc private func deleteSticker(sender: UIButton) {
         if selectedView.layer.borderWidth > 0 {
-            unSelectView(selectedView)
+            deselectView(selectedView)
             selectedView.removeFromSuperview()
             options.stickerActionSelectedClosure?(.Delete)
         }

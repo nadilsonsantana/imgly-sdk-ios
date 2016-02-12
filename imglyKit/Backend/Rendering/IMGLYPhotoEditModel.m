@@ -20,7 +20,7 @@
         _autoEnhancementEnabled = false;
         _brightness = 0;
         _contrast = 1;
-        _normalizedCropRect = CGRectZero;
+        _normalizedCropRect = [[self class] identityNormalizedCropRect];
         _saturation = 1;
         _straightenAngle = 0;
     }

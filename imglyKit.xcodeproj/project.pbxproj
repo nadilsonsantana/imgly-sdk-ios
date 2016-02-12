@@ -215,6 +215,8 @@
 		2B1B9AF61C52625100C6D276 /* CGVectorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */; };
 		2B1B9AF81C52848700C6D276 /* TextLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B9AF71C52848700C6D276 /* TextLabel.swift */; };
 		2B319B651C45070200515C9D /* FlashController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B319B641C45070200515C9D /* FlashController.swift */; };
+		2B4468DC1C6C894600A2626B /* PhotoEditToolController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4468DB1C6C894600A2626B /* PhotoEditToolController.swift */; };
+		2B4468DE1C6C9D5E00A2626B /* CGSizeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4468DD1C6C9D5E00A2626B /* CGSizeExtension.swift */; };
 		2B4509A51C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */; };
 		2B4509A61C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */; };
 		2B50239E1C286B0400CE9AD3 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B50239D1C286B0400CE9AD3 /* Filter.swift */; };
@@ -528,6 +530,8 @@
 		2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGVectorExtension.swift; sourceTree = "<group>"; };
 		2B1B9AF71C52848700C6D276 /* TextLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextLabel.swift; sourceTree = "<group>"; };
 		2B319B641C45070200515C9D /* FlashController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlashController.swift; sourceTree = "<group>"; };
+		2B4468DB1C6C894600A2626B /* PhotoEditToolController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEditToolController.swift; sourceTree = "<group>"; };
+		2B4468DD1C6C9D5E00A2626B /* CGSizeExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGSizeExtension.swift; sourceTree = "<group>"; };
 		2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEffect.swift; sourceTree = "<group>"; };
 		2B50239D1C286B0400CE9AD3 /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
 		2B5728051C28594E0003EF8F /* EffectFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EffectFilter.swift; sourceTree = "<group>"; };
@@ -906,6 +910,7 @@
 				2BC101BA1C43C72000C04A47 /* AVCaptureDeviceExtension.swift */,
 				2BEBFEAA1C3FEF6400FAA95C /* AVCaptureVideoOrientationExtension.swift */,
 				2BEBFEAC1C3FF0CD00FAA95C /* CGRectExtension.swift */,
+				2B4468DD1C6C9D5E00A2626B /* CGSizeExtension.swift */,
 				2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */,
 				2B1ADA0F1B19C3F300C98522 /* InstanceFactoryExtension.swift */,
 				09764D581C722E7600577B1E /* NSErrorExtension.swift */,
@@ -972,6 +977,7 @@
 		2BC5A5251C6A31F500C03C82 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				2B4468DB1C6C894600A2626B /* PhotoEditToolController.swift */,
 			);
 			path = Tools;
 			sourceTree = "<group>";
@@ -1804,6 +1810,7 @@
 				2BF4D4FF1AF1155E00C801B2 /* BreezeFilter.swift in Sources */,
 				2BF4D3D81AF1150500C801B2 /* FilterSelectionController.swift in Sources */,
 				2BF4D5391AF1155E00C801B2 /* WinterFilter.swift in Sources */,
+				2B4468DE1C6C9D5E00A2626B /* CGSizeExtension.swift in Sources */,
 				2BC537931C513A1800A7DE17 /* OrientationEditorViewControllerOptions.swift in Sources */,
 				2BF4D3AC1AF114FA00C801B2 /* CameraViewController.swift in Sources */,
 				2BF4D52B1AF1155E00C801B2 /* QuoziFilter.swift in Sources */,
@@ -1872,6 +1879,7 @@
 				2B50239E1C286B0400CE9AD3 /* Filter.swift in Sources */,
 				093D11161C60F90800B72B7A /* BrightnessEditorViewController.swift in Sources */,
 				2BF4D50E1AF1155E00C801B2 /* FoodFilter.swift in Sources */,
+				2B4468DC1C6C894600A2626B /* PhotoEditToolController.swift in Sources */,
 				2BF4D3D21AF1150500C801B2 /* ContrastEditorViewController.swift in Sources */,
 				2BF4D5141AF1155E00C801B2 /* K1Filter.swift in Sources */,
 				2BF717D91B414FC600D4A50C /* ShapeLayer.swift in Sources */,

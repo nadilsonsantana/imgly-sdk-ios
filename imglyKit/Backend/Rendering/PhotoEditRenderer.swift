@@ -108,6 +108,10 @@ import CoreImage
                 filter.setValue(photoEditModel.brightness, forKey: kCIInputBrightnessKey)
                 filter.setValue(photoEditModel.saturation, forKey: kCIInputSaturationKey)
                 filter.setValue(editedImage, forKey: kCIInputImageKey)
+
+                if let outputImage = filter.outputImage {
+                    editedImage = outputImage
+                }
             }
         }
 

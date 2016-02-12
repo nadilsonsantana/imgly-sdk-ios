@@ -19,13 +19,13 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
 
 @implementation IMGLYPhotoEditMutableModel
 
-@synthesize appliedOrientation = _appliedOrientation;
-@synthesize autoEnhancementEnabled = _autoEnhancementEnabled;
-@synthesize brightness = _brightness;
-@synthesize contrast = _contrast;
-@synthesize normalizedCropRect = _normalizedCropRect;
-@synthesize saturation = _saturation;
-@synthesize straightenAngle = _straightenAngle;
+@dynamic appliedOrientation;
+@dynamic autoEnhancementEnabled;
+@dynamic brightness;
+@dynamic contrast;
+@dynamic normalizedCropRect;
+@dynamic saturation;
+@dynamic straightenAngle;
 
 #pragma mark - Changes
 

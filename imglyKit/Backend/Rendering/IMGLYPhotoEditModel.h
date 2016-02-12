@@ -21,7 +21,16 @@ typedef NS_ENUM(NSInteger, IMGLYOrientation) {
     IMGLYOrientationRotate270
 };
 
-@interface IMGLYPhotoEditModel : NSObject <NSCopying>
+@interface IMGLYPhotoEditModel : NSObject <NSCopying> {
+  @protected
+    IMGLYOrientation _appliedOrientation;
+    BOOL _autoEnhancementEnabled;
+    CGFloat _brightness;
+    CGFloat _contrast;
+    CGRect _normalizedCropRect;
+    CGFloat _saturation;
+    CGFloat _straightenAngle;
+}
 
 NS_ASSUME_NONNULL_BEGIN
 

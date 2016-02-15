@@ -5,3 +5,4 @@ disabled_rules:
   - type_body_length
   - valid_docs
   - cyclomatic_complexity
+  - variable_name

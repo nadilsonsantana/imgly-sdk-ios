@@ -40,10 +40,8 @@ public typealias RecordingModeButtonConfigurationClosure = (UIButton, RecordingM
     /// Use this closure to configure the timelabel.
     public let timeLabelConfigurationClosure: LabelConfigurationClosure?
 
-    // swiftlint:disable variable_name
     /// Use this closure to configure the filter intensity slider.
     public let filterIntensitySliderConfigurationClosure: SliderConfigurationClosure?
-    // swiftlint:enable variable_name
 
     /// Use this closure to configure the given recording mode button. By default the buttons
     /// light up in yellow, when selected.
@@ -159,10 +157,8 @@ public typealias RecordingModeButtonConfigurationClosure = (UIButton, RecordingM
     /// Use this closure to configure the timelabel. Defaults to an empty implementation.
     public var timeLabelConfigurationClosure: LabelConfigurationClosure? = nil
 
-    // swiftlint:disable variable_name
     /// Use this closure to configure the filter intensity slider. Defaults to an empty implementation.
     public var filterIntensitySliderConfigurationClosure: SliderConfigurationClosure? = nil
-    // swiftlint:enable variable_name
 
     /// Use this closure to configure the given recording mode button. By default the buttons
     /// light up in yellow, when selected.

@@ -13,7 +13,6 @@ import CoreGraphics
 Adds framework-related methods to `UIImage`.
 */
 public extension UIImage {
-    // swiftlint:disable variable_name
     /// Returns a copy of the image, taking into account its orientation
     public var imgly_normalizedImage: UIImage {
         if imageOrientation == .Up {

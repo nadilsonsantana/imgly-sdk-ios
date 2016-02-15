@@ -17,9 +17,7 @@ import UIKit
 
 let kStickersCollectionViewCellSize = CGSize(width: 90, height: 90)
 
-// swiftlint:disable variable_name
 let kStickersCollectionViewCellReuseIdentifier = "StickersCollectionViewCell"
-// swiftlint:enable variable_name
 
 @objc(IMGLYStickersEditorViewController) public class StickersEditorViewController: SubEditorViewController {
 

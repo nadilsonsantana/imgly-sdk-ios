@@ -17,6 +17,9 @@ import UIKit
     /// MainEditorActionsDataSource providing all editors.
     public let editorActionsDataSource: MainEditorActionsDataSourceProtocol
 
+    /// The color of the separator that is drawn to separate different menu items
+    public let separatorColor: UIColor
+
     /// Setting this to `true` results in the crop editor being displayed immediately if the image passed
     /// to the view controller doesn't have an aspect ratio that is equal to one of the allowed crop actions.
     /// This property only works if you do **not** specify `.Free` as one of the allowed crop actions.
@@ -40,6 +43,7 @@ import UIKit
      */
     public init(builder: MainEditorViewControllerOptionsBuilder) {
         editorActionsDataSource = builder.editorActionsDataSource
+        separatorColor = builder.separatorColor
         forceCrop = builder.forceCrop
         super.init(editorBuilder: builder)
     }
@@ -54,6 +58,9 @@ import UIKit
     /// Specifies the actions available in the bottom drawer. Defaults to the
     /// MainEditorActionsDataSource providing all editors.
     public var editorActionsDataSource: MainEditorActionsDataSourceProtocol = MainEditorActionsDataSource()
+
+    /// The color of the separator that is drawn to separate different menu items
+    public var separatorColor: UIColor = UIColor(red: 0.27, green: 0.27, blue: 0.27, alpha: 1)
 
     /// Setting this to `true` results in the crop editor being displayed immediately if the image passed
     /// to the view controller doesn't have an aspect ratio that is equal to one of the allowed crop actions.

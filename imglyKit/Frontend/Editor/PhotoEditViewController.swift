@@ -11,20 +11,115 @@ import GLKit
 
 @objc(IMGLYPhotoEditViewController) public class PhotoEditViewController: UIViewController {
 
-    // MARK: - Initializers
+    // MARK: - Statics
+
+    static let ButtonCollectionViewCellReuseIdentifier = "ButtonCollectionViewCell"
+    static let SeparatorCollectionViewCellReuseIdentifier = "SeparatorCollectionViewCellReuseIdentifier"
+    static let ButtonCollectionViewCellSize = CGSize(width: 64, height: 64)
+    static let SeparatorCollectionViewCellSize = CGSize(width: 13, height: 64)
+
+    // MARK: - View Properties
+
+    private var mainToolbar: UIView?
+    private var secondaryToolbar: UIView?
+    private var collectionView: UICollectionView?
+    private var previewViewScrollingContainer: UIScrollView?
+    private var mainPreviewView: GLKView?
+    private var placeholderImageView: UIImageView?
+
+    // MARK: - Constraint Properties
+
+    private var mainToolbarConstraints: [NSLayoutConstraint]?
+    private var secondaryToolbarConstraints: [NSLayoutConstraint]?
+    private var collectionViewConstraints: [NSLayoutConstraint]?
+    private var placeholderImageViewConstraints: [NSLayoutConstraint]?
+    private var previewViewScrollingContainerConstraints: [NSLayoutConstraint]?
+
+    // MARK: - Model Properties
 
     private var photo: UIImage? {
         didSet {
-            updatePlaceholderImage()
+        updatePlaceholderImage()
         }
     }
 
     let configuration: Configuration
 
+    private var photoEditModel: IMGLYPhotoEditMutableModel? {
+        didSet {
+        if oldValue != photoEditModel {
+            if let oldPhotoEditModel = oldValue {
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: IMGLYPhotoEditModelDidChangeNotification, object: oldPhotoEditModel)
+            }
+
+            if let photoEditModel = photoEditModel {
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: "photoEditModelDidChange:", name: IMGLYPhotoEditModelDidChangeNotification, object: photoEditModel)
+                updateMainRenderer()
+                setupToolsIfNeeded()
+            }
+        }
+        }
+    }
+
+    @NSCopying private var uneditedPhotoEditModel: IMGLYPhotoEditModel?
+
+    private var baseWorkUIImage: UIImage? {
+        didSet {
+        if oldValue != baseWorkUIImage {
+
+            let ciImage: CIImage?
+            if let baseWorkUIImage = baseWorkUIImage {
+                ciImage = orientedCIImageFromUIImage(baseWorkUIImage)
+            } else {
+                ciImage = nil
+            }
+
+            baseWorkCIImage = ciImage
+            updateMainRenderer()
+
+            if baseWorkUIImage != nil {
+                // TODO: Save to disc
+                photo = nil
+            }
+        }
+        }
+    }
+
+    private var baseWorkCIImage: CIImage?
+
+    private var currentEditingTool: PhotoEditToolController?
+
+    private var mainRenderer: PhotoEditRenderer?
+
+    private var nextRenderCompletionBlock: (() -> Void)?
+
+    // MARK: - State Properties
+
+    private var previewViewScrollingContainerLayoutValid = false
+    private var lastKnownWorkImageSize = CGSize.zero
+    private var lastKnownPreviewViewSize = CGSize.zero
+
+    // MARK: - Initializers
+
+    /**
+    Returns a newly initialized photo edit view controller for the given photo with a default configuration.
+
+    - parameter photo: The photo to edit.
+
+    - returns: A newly initialized `PhotoEditViewController` object.
+    */
     convenience public init(photo: UIImage) {
         self.init(photo: photo, configuration: Configuration())
     }
 
+    /**
+     Returns a newly initialized photo edit view controller for the given photo with the given configuration options.
+
+     - parameter photo:         The photo to edit.
+     - parameter configuration: The configuration options to apply.
+
+     - returns: A newly initialized and configured `PhotoEditViewController` object.
+     */
     required public init(photo: UIImage, configuration: Configuration) {
         self.photo = photo
         self.configuration = configuration
@@ -33,18 +128,24 @@ import GLKit
         updateLastKnownImageSize()
     }
 
+    /**
+     :nodoc:
+     */
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - Configuration
+
+    private var options: MainEditorViewControllerOptions {
+        return self.configuration.mainEditorViewControllerOptions
+    }
+
     // MARK: - UIViewController
 
-    private var mainToolbar: UIView?
-    private var secondaryToolbar: UIView?
-
-    private var previewViewScrollingContainer: UIScrollView?
-    private var mainPreviewView: GLKView?
-
+    /**
+     :nodoc:
+     */
     public override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -69,25 +170,60 @@ import GLKit
         view.setNeedsUpdateConstraints()
     }
 
+    /**
+     :nodoc:
+     */
     public override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
 
         loadPhotoEditModelIfNecessary()
         updateToolbars()
+        updateCollectionView()
         updateBackgroundColor()
         updatePlaceholderImage()
         updateRenderedPreviewForceRender(false)
     }
 
+    /**
+     :nodoc:
+     */
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         updateScrollViewContentSize()
     }
 
-    private var mainToolbarConstraints: [NSLayoutConstraint]?
-    private var secondaryToolbarConstraints: [NSLayoutConstraint]?
+    /**
+     :nodoc:
+     */
+    public override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return .LightContent
+    }
 
+    /**
+     :nodoc:
+     */
+    public override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+
+    /**
+     :nodoc:
+     */
+    public override func shouldAutorotate() -> Bool {
+        return false
+    }
+
+    /**
+     :nodoc:
+     */
+    public override func preferredInterfaceOrientationForPresentation() -> UIInterfaceOrientation {
+        return .Portrait
+    }
+
+    /**
+     :nodoc:
+     */
     public override func updateViewConstraints() {
         super.updateViewConstraints()
 
@@ -115,7 +251,7 @@ import GLKit
             constraints.append(NSLayoutConstraint(item: mainToolbar, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: mainToolbar, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: mainToolbar, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: mainToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 110))
+            constraints.append(NSLayoutConstraint(item: mainToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 124))
 
             mainToolbarConstraints = constraints
             NSLayoutConstraint.activateConstraints(constraints)
@@ -129,38 +265,38 @@ import GLKit
             constraints.append(NSLayoutConstraint(item: secondaryToolbar, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: secondaryToolbar, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: secondaryToolbar, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: secondaryToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 40))
+            constraints.append(NSLayoutConstraint(item: secondaryToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 44))
 
             mainToolbarConstraints = constraints
             NSLayoutConstraint.activateConstraints(constraints)
         }
-    }
 
-    private var photoEditModel: IMGLYPhotoEditMutableModel? {
-        didSet {
-            if oldValue != photoEditModel {
-                if let oldPhotoEditModel = oldValue {
-                    NSNotificationCenter.defaultCenter().removeObserver(self, name: IMGLYPhotoEditModelDidChangeNotification, object: oldPhotoEditModel)
-                }
+        if let collectionView = collectionView, mainToolbar = mainToolbar where collectionViewConstraints == nil {
+            collectionView.translatesAutoresizingMaskIntoConstraints = false
 
-                if let photoEditModel = photoEditModel {
-                    NSNotificationCenter.defaultCenter().addObserver(self, selector: "photoEditModelDidChange:", name: IMGLYPhotoEditModelDidChangeNotification, object: photoEditModel)
-                    updateMainRenderer()
-                    setupToolsIfNeeded()
-                }
-            }
+            var constraints = [NSLayoutConstraint]()
+
+            constraints.append(NSLayoutConstraint(item: collectionView, attribute: .Left, relatedBy: .Equal, toItem: mainToolbar, attribute: .Left, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: collectionView, attribute: .Right, relatedBy: .Equal, toItem: mainToolbar, attribute: .Right, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: collectionView, attribute: .Top, relatedBy: .Equal, toItem: mainToolbar, attribute: .Top, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: collectionView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 80))
+
+            collectionViewConstraints = constraints
+            NSLayoutConstraint.activateConstraints(constraints)
         }
     }
+
+    // MARK: - Notification Callbacks
 
     @objc private func photoEditModelDidChange(notification: NSNotification) {
         updateRenderedPreviewForceRender(false)
     }
 
+    // MARK: - Setup
+
     private func setupToolsIfNeeded() {
         // TODO
     }
-
-    @NSCopying private var uneditedPhotoEditModel: IMGLYPhotoEditModel?
 
     private func loadPhotoEditModelIfNecessary() {
         if photoEditModel == nil {
@@ -186,6 +322,29 @@ import GLKit
             view.addSubview(secondaryToolbar!)
             updateSubviewsOrdering()
             view.setNeedsUpdateConstraints()
+        }
+    }
+
+    private func updateCollectionView() {
+        if collectionView == nil && mainToolbar != nil {
+            let flowLayout = UICollectionViewFlowLayout()
+            flowLayout.scrollDirection = .Horizontal
+            flowLayout.sectionInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+            flowLayout.minimumInteritemSpacing = 8
+            flowLayout.minimumLineSpacing = 8
+
+            let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
+            collectionView.showsVerticalScrollIndicator = false
+            collectionView.showsHorizontalScrollIndicator = false
+            collectionView.dataSource = self
+            collectionView.delegate = self
+            collectionView.backgroundColor = UIColor.clearColor()
+            collectionView.registerClass(ButtonCollectionViewCell.self, forCellWithReuseIdentifier: PhotoEditViewController.ButtonCollectionViewCellReuseIdentifier)
+            collectionView.registerClass(SeparatorCollectionViewCell.self, forCellWithReuseIdentifier: PhotoEditViewController.SeparatorCollectionViewCellReuseIdentifier)
+
+            self.collectionView = collectionView
+            mainToolbar?.addSubview(collectionView)
+            updateSubviewsOrdering()
         }
     }
 
@@ -223,47 +382,6 @@ import GLKit
         }
     }
 
-    private func workImageSizeForScreen(screen: UIScreen) -> CGSize {
-        let screenSize = screen.bounds.size
-        let screenScale = screen.scale
-
-        let scaledScreenSize = screenSize * screenScale
-        let maxLength = max(scaledScreenSize.width, scaledScreenSize.height)
-
-        return CGSize(width: maxLength, height: maxLength)
-    }
-
-    private var baseWorkUIImage: UIImage? {
-        didSet {
-            if oldValue != baseWorkUIImage {
-
-                let ciImage: CIImage?
-                if let baseWorkUIImage = baseWorkUIImage {
-                    ciImage = orientedCIImageFromUIImage(baseWorkUIImage)
-                } else {
-                    ciImage = nil
-                }
-
-                baseWorkCIImage = ciImage
-                updateMainRenderer()
-
-                if baseWorkUIImage != nil {
-                    // TODO: Save to disc
-                    photo = nil
-                }
-            }
-        }
-    }
-
-    private var baseWorkCIImage: CIImage?
-
-    private func orientedCIImageFromUIImage(image: UIImage) -> CIImage {
-        // TODO: Fix force unwrap
-        var ciImage = CIImage(CGImage: image.CGImage!)
-        ciImage = ciImage.imageByApplyingOrientation(Int32(image.imageOrientation.rawValue))
-        return ciImage
-    }
-
     private func updateMainRenderer() {
         if mainRenderer == nil {
             if let photoEditModel = photoEditModel, baseWorkCIImage = baseWorkCIImage {
@@ -295,8 +413,6 @@ import GLKit
         }
     }
 
-    private var placeholderImageView: UIImageView?
-    private var placeholderImageViewConstraints: [NSLayoutConstraint]?
 
     private func updatePlaceholderImage() {
         if isViewLoaded() {
@@ -345,6 +461,10 @@ import GLKit
 
         if let mainToolbar = mainToolbar {
             view.bringSubviewToFront(mainToolbar)
+
+            if let collectionView = collectionView {
+                mainToolbar.bringSubviewToFront(collectionView)
+            }
         }
 
         if let secondaryToolbar = secondaryToolbar {
@@ -359,9 +479,6 @@ import GLKit
             previewViewScrollingContainer.sendSubviewToBack(placeholderImageView)
         }
     }
-
-    private var previewViewScrollingContainerLayoutValid = false
-    private var previewViewScrollingContainerConstraints: [NSLayoutConstraint]?
 
     private func updatePreviewContainerLayout() {
         if previewViewScrollingContainerLayoutValid {
@@ -398,11 +515,6 @@ import GLKit
         previewViewScrollingContainerLayoutValid = true
     }
 
-    private var lastKnownWorkImageSize = CGSize.zero
-    private var lastKnownPreviewViewSize = CGSize.zero
-
-    private var currentEditingTool: PhotoEditToolController?
-
     private func updateRenderedPreviewForceRender(forceRender: Bool) {
         mainRenderer?.renderMode = currentEditingTool?.preferredRenderMode ?? .All
 
@@ -421,12 +533,40 @@ import GLKit
         }
     }
 
-    private var mainRenderer: PhotoEditRenderer?
+    // MARK: - Helpers
 
-    private var nextRenderCompletionBlock: (() -> Void)?
+    private func workImageSizeForScreen(screen: UIScreen) -> CGSize {
+        let screenSize = screen.bounds.size
+        let screenScale = screen.scale
+
+        let scaledScreenSize = screenSize * screenScale
+        let maxLength = max(scaledScreenSize.width, scaledScreenSize.height)
+
+        return CGSize(width: maxLength, height: maxLength)
+    }
+
+    private func orientedCIImageFromUIImage(image: UIImage) -> CIImage {
+        // TODO: Fix force unwrap
+        var ciImage = CIImage(CGImage: image.CGImage!)
+        ciImage = ciImage.imageByApplyingOrientation(Int32(image.imageOrientation.rawValue))
+        return ciImage
+    }
+
+    private func scaleSize(size: CGSize, toFitSize targetSize: CGSize) -> CGSize {
+        if size == CGSize.zero {
+            return CGSize.zero
+        }
+
+        let scale = min(targetSize.width / size.width, targetSize.height / size.height)
+
+        return size * scale
+    }
 }
 
 extension PhotoEditViewController: GLKViewDelegate {
+    /**
+     :nodoc:
+     */
     public func glkView(view: GLKView, drawInRect rect: CGRect) {
         if let renderer = mainRenderer {
             renderer.drawOutputImageInContext(view.context, inRect: CGRect(x: 0, y: 0, width: view.drawableWidth, height: view.drawableHeight), viewportWidth: view.drawableWidth, viewportHeight: view.drawableHeight)
@@ -493,22 +633,18 @@ extension PhotoEditViewController: UIScrollViewDelegate {
         updateScrollViewCentering()
     }
 
-    private func scaleSize(size: CGSize, toFitSize targetSize: CGSize) -> CGSize {
-        if size == CGSize.zero {
-            return CGSize.zero
-        }
-
-        let scale = min(targetSize.width / size.width, targetSize.height / size.height)
-
-        return size * scale
-    }
-
+    /**
+     :nodoc:
+     */
     public func scrollViewDidZoom(scrollView: UIScrollView) {
         if previewViewScrollingContainer == scrollView {
             updateScrollViewCentering()
         }
     }
 
+    /**
+     :nodoc:
+     */
     public func scrollViewDidEndZooming(scrollView: UIScrollView, withView view: UIView?, atScale scale: CGFloat) {
         if previewViewScrollingContainer == scrollView {
             mainPreviewView?.contentScaleFactor = scale * UIScreen.mainScreen().scale
@@ -516,11 +652,112 @@ extension PhotoEditViewController: UIScrollViewDelegate {
         }
     }
 
+    /**
+     :nodoc:
+     */
     public func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         if previewViewScrollingContainer == scrollView {
             return mainPreviewView
         }
 
         return nil
+    }
+}
+
+extension PhotoEditViewController: UICollectionViewDataSource {
+    /**
+     :nodoc:
+     */
+    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return options.editorActionsDataSource.actionCount
+    }
+
+    /**
+     :nodoc:
+     */
+    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let dataSource = options.editorActionsDataSource
+        let action = dataSource.actionAtIndex(indexPath.item)
+
+        if action.editorType == .Separator {
+            let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoEditViewController.SeparatorCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
+
+            if let separatorCell = cell as? SeparatorCollectionViewCell {
+                separatorCell.separator.backgroundColor = options.separatorColor
+            }
+
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoEditViewController.ButtonCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
+
+            if let buttonCell = cell as? ButtonCollectionViewCell {
+                buttonCell.textLabel.text = action.title
+                buttonCell.imageView.image = action.image
+                buttonCell.accessibilityLabel = action.title
+            }
+
+            return cell
+        }
+    }
+}
+
+extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
+    /**
+     :nodoc:
+     */
+    public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        let action = options.editorActionsDataSource.actionAtIndex(indexPath.item)
+
+        if action.editorType == .Separator {
+            return PhotoEditViewController.SeparatorCollectionViewCellSize
+        }
+
+        return PhotoEditViewController.ButtonCollectionViewCellSize
+    }
+
+    /**
+     :nodoc:
+     */
+    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        let action = options.editorActionsDataSource.actionAtIndex(indexPath.item)
+
+        if action.editorType == .Separator {
+            return
+        }
+
+        if action.editorType == .Magic {
+            guard let photoEditModel = photoEditModel else {
+                return
+            }
+
+            photoEditModel.performChangesWithBlock {
+                photoEditModel.autoEnhancementEnabled = !photoEditModel.autoEnhancementEnabled
+            }
+        } else {
+            // TODO
+        }
+        
+        collectionView.reloadItemsAtIndexPaths([indexPath])
+    }
+
+    /**
+     :nodoc:
+     */
+    public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        let action = options.editorActionsDataSource.actionAtIndex(indexPath.item)
+        
+        if action.editorType == .Magic {
+            if let buttonCell = cell as? ButtonCollectionViewCell, let selectedImage = action.selectedImage {
+                if photoEditModel?.autoEnhancementEnabled ?? false {
+                    buttonCell.accessibilityTraits |= UIAccessibilityTraitSelected
+                    buttonCell.imageView.image = selectedImage
+                    buttonCell.imageView.tintAdjustmentMode = .Dimmed
+                } else {
+                    buttonCell.accessibilityTraits &= ~UIAccessibilityTraitSelected
+                    buttonCell.imageView.image = action.image
+                    buttonCell.imageView.tintAdjustmentMode = .Normal
+                }
+            }
+        }
     }
 }

@@ -9,7 +9,13 @@
 import Foundation
 import CoreImage
 
+/**
+ *  A `PhotoEditRenderer` takes a `CIImage` and an `IMGLYPhotoEditModel` as input and takes care of applying all necessary effects and filters to the image.
+ *  The output image can then be rendered into an `EAGLContext` or converted into a `CGImage` instance.
+ */
 @objc(IMGLYPhotoEditRenderer) public class PhotoEditRenderer: NSObject {
+
+    /// The input image.
     public var originalImage: CIImage? {
         didSet {
             if oldValue != originalImage {
@@ -18,6 +24,7 @@ import CoreImage
         }
     }
 
+    /// The photo edit model that describes all effects that should be applied to the input image.
     public var photoEditModel: IMGLYPhotoEditModel? {
         didSet {
             if oldValue != photoEditModel {
@@ -26,6 +33,7 @@ import CoreImage
         }
     }
 
+    /// The render mode describes which effects should be applied to the input image.
     public var renderMode = IMGLYRenderMode.All {
         didSet {
             if oldValue != renderMode {
@@ -34,13 +42,14 @@ import CoreImage
         }
     }
 
-    public var effectFilter: EffectFilter?
+    private var effectFilter: EffectFilter?
 
     private lazy var renderingQueue = dispatch_queue_create("photo_edit_rendering", DISPATCH_QUEUE_SERIAL)
 
     private var cachedOutputImage: CIImage?
     @NSCopying private var photoEditModelInCachedOutputImage: IMGLYPhotoEditModel?
 
+    /// A `CIImage` instance with all effects and filters applied to it.
     public var outputImage: CIImage {
         // Preconditions
         guard let originalImage = originalImage else {
@@ -77,7 +86,7 @@ import CoreImage
                 if i == 0 {
                     filters[i].setValue(editedImage, forKey: kCIInputImageKey)
                 } else {
-                    filters[i].setValue(filters[i - 1], forKey: kCIInputImageKey)
+                    filters[i].setValue(filters[i - 1].outputImage, forKey: kCIInputImageKey)
                 }
             }
 
@@ -121,6 +130,7 @@ import CoreImage
         return editedImage
     }
 
+    /// The size of the output image.
     public var outputImageSize: CGSize {
         // Preconditions
         guard let originalImage = originalImage else {
@@ -205,10 +215,20 @@ import CoreImage
         return generatingCIContext.createCGImage(outputImage, fromRect: outputImage.extent)
     }
 
+    /**
+     Applies all necessary filters and effects to the input image and converts it to an instance of `CGImage`.
+
+     - returns: A newly created instance of `CGImage`.
+     */
     public func newOutputImage() -> CGImage {
         return newCGImageFromOutputCIImage(outputImage)
     }
 
+    /**
+     Same as `newOutputImage()` but asynchronously.
+
+     - parameter completion: A completion handler that receives the newly created instance of `CGImage` once rendering is complete.
+     */
     public func createOutputImageWithCompletion(completion: ((outputImage: CGImage) -> Void)?) {
         dispatch_async(renderingQueue) {
             let image = self.newCGImageFromOutputCIImage(self.outputImage)
@@ -219,6 +239,14 @@ import CoreImage
     private var drawingCIContext: CIContext?
     private var lastUsedEAGLContext: EAGLContext?
 
+    /**
+     Draws the output image into the given `EAGLContext`.
+
+     - parameter context:        An instance of `EAGLContext` to draw into.
+     - parameter rect:           The `CGRect` in which the output image should be drawn.
+     - parameter viewportWidth:  The width of the view that displays the framebuffer's content.
+     - parameter viewportHeight: The height of the view that displays the framebuffer's content.
+     */
     public func drawOutputImageInContext(context: EAGLContext, inRect rect: CGRect, viewportWidth: Int, viewportHeight: Int) {
         glClearColor(0, 0, 0, 1.0)
         glViewport(0, 0, GLsizei(viewportWidth), GLsizei(viewportHeight))

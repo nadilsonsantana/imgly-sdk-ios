@@ -461,6 +461,7 @@
 		2BF5C5CC1C6B68F0007BEE3F /* CGAffineTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */; };
 		2BF5C5CE1C6B6949007BEE3F /* CenteredScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF5C5CD1C6B6949007BEE3F /* CenteredScrollView.swift */; };
 		2BF717D91B414FC600D4A50C /* ShapeLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF717D71B414FC600D4A50C /* ShapeLayer.swift */; };
+		2BFC627C1C720CC2006991D2 /* SeparatorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFC627B1C720CC2006991D2 /* SeparatorCollectionViewCell.swift */; };
 		E990B2341C20506600806B30 /* FiltersDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E990B2331C20506600806B30 /* FiltersDataSource.swift */; };
 		E9AF1E621C0F2E0D00893621 /* MainEditorActionsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9AF1E611C0F2E0D00893621 /* MainEditorActionsDataSource.swift */; };
 		E9D550EE1C05E27D00CE72C3 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9D550ED1C05E27D00CE72C3 /* Configuration.swift */; };
@@ -768,6 +769,7 @@
 		2BF51F6F1B41A7E700FFB4C2 /* RecordingMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RecordingMode.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		2BF5C5CD1C6B6949007BEE3F /* CenteredScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CenteredScrollView.swift; path = imglyKit/Frontend/Views/CenteredScrollView.swift; sourceTree = SOURCE_ROOT; };
 		2BF717D71B414FC600D4A50C /* ShapeLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShapeLayer.swift; sourceTree = "<group>"; };
+		2BFC627B1C720CC2006991D2 /* SeparatorCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeparatorCollectionViewCell.swift; sourceTree = "<group>"; };
 		E990B2331C20506600806B30 /* FiltersDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiltersDataSource.swift; sourceTree = "<group>"; };
 		E9AF1E611C0F2E0D00893621 /* MainEditorActionsDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MainEditorActionsDataSource.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E9D550ED1C05E27D00CE72C3 /* Configuration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
@@ -1090,6 +1092,7 @@
 				2BF4D3CB1AF1150400C801B2 /* TextEditorViewController.swift */,
 				2B1B9AF71C52848700C6D276 /* TextLabel.swift */,
 				2BC5A5251C6A31F500C03C82 /* Tools */,
+				2BFC627B1C720CC2006991D2 /* SeparatorCollectionViewCell.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -1943,6 +1946,7 @@
 				2BF4D52A1AF1155E00C801B2 /* Pro400Filter.swift in Sources */,
 				093D11211C60F90800B72B7A /* ZoomingImageView.swift in Sources */,
 				2BF4D50D1AF1155E00C801B2 /* FixieFilter.swift in Sources */,
+				2BFC627C1C720CC2006991D2 /* SeparatorCollectionViewCell.swift in Sources */,
 				E9AF1E621C0F2E0D00893621 /* MainEditorActionsDataSource.swift in Sources */,
 				2BF4D5171AF1155E00C801B2 /* KDynamicFilter.swift in Sources */,
 				2BC537951C513A2200A7DE17 /* FocusEditorViewControllerOptions.swift in Sources */,

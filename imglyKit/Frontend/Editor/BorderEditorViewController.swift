@@ -9,10 +9,7 @@
 import UIKit
 
 let kBorderCollectionViewCellSize = CGSize(width: 90, height: 90)
-
-// swiftlint:disable variable_name
 let kBorderCollectionViewCellReuseIdentifier = "BorderCollectionViewCell"
-// swiftlint:enable variable_name
 
 @objc(IMGLYBorderEditorViewController) public class BorderEditorViewController: SubEditorViewController {
 

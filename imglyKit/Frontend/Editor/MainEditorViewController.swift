@@ -25,6 +25,7 @@ import UIKit
     case Contrast
     case Saturation
     case Text
+    case Separator
 }
 
 public typealias EditorCompletionBlock = (EditorResult, UIImage?) -> Void

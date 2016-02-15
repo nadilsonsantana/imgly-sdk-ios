@@ -70,9 +70,7 @@ public typealias PullableViewConfigurationClosure = (PullableView) -> ()
 
     /// This closure allows further configuration of the bottom bar font buttons. The closure is called for
     /// each button and has the button and its corresponding action as parameters.
-    // swiftlint:disable variable_name
     public let fontQuickSelectorButtonConfigurationClosure: FontQuickSelectorButtonConfigurationClosure?
-    // swiftlint:enable variable_name
 
     /// This closure allows further configuration of the font buttons. The closure is called for
     /// each button and has the button and its corresponding action as parameters.
@@ -169,9 +167,7 @@ The default `TextEditorViewControllerOptionsBuilder` for `TextEditorViewControll
 
     /// This closure allows further configuration of the bottom bar font buttons. The closure is called for
     /// each button and has the button and its corresponding action as parameters.
-    // swiftlint:disable variable_name
     public var fontQuickSelectorButtonConfigurationClosure: FontQuickSelectorButtonConfigurationClosure? = nil
-    // swiftlint:enable variable_name
 
     /// This closure allows further configuration of the font buttons. The closure is called for
     /// each button and has the button and its corresponding action as parameters.

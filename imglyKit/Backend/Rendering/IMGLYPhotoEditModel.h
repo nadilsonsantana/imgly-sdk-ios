@@ -34,15 +34,43 @@ typedef NS_ENUM(NSInteger, IMGLYOrientation) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ *  The orientation of the image.
+ */
 @property(nonatomic, readonly) IMGLYOrientation appliedOrientation;
+
+/**
+ *  Enable auto enhancement.
+ */
 @property(nonatomic, readonly, getter=isAutoEnhancementEnabled) BOOL autoEnhancementEnabled;
+
+/**
+ *  The brightness of the image.
+ */
 @property(nonatomic, readonly) CGFloat brightness;
+
+/**
+ *  The contrast of the image.
+ */
 @property(nonatomic, readonly) CGFloat contrast;
+
+/**
+ *  The normalized crop rect of the image.
+ */
 @property(nonatomic, readonly) CGRect normalizedCropRect;
+
+/**
+ *  The saturation of the image.
+ */
 @property(nonatomic, readonly) CGFloat saturation;
+
+/**
+ *  The straighten angle of the image.
+ */
 @property(nonatomic, readonly) CGFloat straightenAngle;
 
 - (BOOL)isEqualToPhotoEditModel:(IMGLYPhotoEditModel *)photoEditModel;
+
 + (IMGLYOrientation)identityOrientation;
 + (CGRect)identityNormalizedCropRect;
 

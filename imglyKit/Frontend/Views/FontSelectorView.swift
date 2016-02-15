@@ -50,10 +50,7 @@ import UIKit
 
     /// This closure allows further configuration of the bottom bar font buttons. The closure is called for
     /// each button and has the button and its corresponding action as parameters.
-    // swiftlint:disable variable_name
     public var fontSelectorButtonConfigurationClosure: FontSelectorButtonConfigurationClosure? = nil
-    // swiftlint:enable variable_name
-
 
     private let kDistanceBetweenButtons = CGFloat(60)
     private let kFontSize = CGFloat(28)

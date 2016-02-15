@@ -18,10 +18,8 @@ import CoreImage
 
     /// The identifier of the effect.
     public let identifier: String
-    // swiftlint:disable variable_name
     /// The name of the `CIFilter` that should be used to apply this effect.
     public let CIFilterName: String?
-    // swiftlint:enable variable_name
     /// The name that is displayed to the user.
     public let displayName: String
     /// Additional options that should be passed to the `CIFilter` object that will be created when applying this effect.

@@ -42,7 +42,7 @@ import UIKit
     */
     public override init() {
         super.init()
-        items = self.itemsForAvailableActions([ .Magic, .Crop, .Orientation, .Filter, .Brightness, .Contrast, .Saturation, .Text, .Stickers, .Focus, .Border ])
+        items = self.itemsForAvailableActions([ .Magic, .Separator, .Crop, .Orientation, .Separator, .Filter, .Brightness, .Contrast, .Saturation, .Separator, .Text, .Stickers, .Focus, .Border ])
     }
 
     /**
@@ -129,6 +129,8 @@ import UIKit
                 actions.append(MainEditorAction(title: Localize("Text"),
                     image: UIImage(named: "icon_option_text", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
                     editorType: .Text))
+            case .Separator:
+                actions.append(MainEditorAction(title: nil, image: nil, editorType: .Separator))
             }
         }
 

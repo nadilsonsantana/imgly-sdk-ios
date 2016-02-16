@@ -113,19 +113,27 @@ import UIKit
             constraints.append(NSLayoutConstraint(item: photoEditViewController.view, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: photoEditViewController.view, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
 
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 124))
-
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
-            constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 44))
+            constraints.appendContentsOf(constraintsForToolbarContainer(toolbarContainer))
 
             NSLayoutConstraint.activateConstraints(constraints)
             photoEditViewControllerConstraints = constraints
         }
+    }
+
+    private func constraintsForToolbarContainer(toolbarContainer: ToolbarContainer) -> [NSLayoutConstraint] {
+        var constraints = [NSLayoutConstraint]()
+
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.mainToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 124))
+
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolbarContainer.secondaryToolbar, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 44))
+
+        return constraints
     }
 
     /**
@@ -208,6 +216,10 @@ import UIKit
     private func updateSubviewsOrdering() {
         view.sendSubviewToBack(photoEditViewController.view)
 
+        for toolController in toolControllers {
+            view.bringSubviewToFront(toolController.view)
+        }
+
         if let toolbarContainer = photoEditViewControllerToolbarContainer {
             view.bringSubviewToFront(toolbarContainer.mainToolbar)
             view.bringSubviewToFront(toolbarContainer.secondaryToolbar)
@@ -226,14 +238,63 @@ import UIKit
     /**
     Pushes a tool controller onto the receiver's stack and updates the display.
 
-    - parameter tool:     The tool controller to push onto the stack. If the tool controller is already on the tool stack, this method throws an exception.
+    - parameter toolController:     The tool controller to push onto the stack. If the tool controller is already on the tool stack, this method throws an exception.
     - parameter animated: Specify `true` to animate the transition and `false` if you do not want the transition to be animated.
     */
-    public func pushToolController(tool: PhotoEditToolController, animated: Bool) {
-        if toolControllers.contains(tool) {
+    public func pushToolController(toolController: PhotoEditToolController, animated: Bool) {
+        if toolControllers.contains(toolController) {
             fatalError("Trying to push a tool controller that is already on the tool stack.")
         }
 
+        toolControllers.append(toolController)
+        addChildViewController(toolController)
+        view.addSubview(toolController.view)
+
+        let toolbarContainer = newToolbarContainer()
+        toolToToolbarContainer[toolController] = toolbarContainer
+        updateToolbarContainer(toolbarContainer, forToolStackItem: toolController.toolStackItem)
+
+        view.addSubview(toolbarContainer.mainToolbar)
+        view.addSubview(toolbarContainer.secondaryToolbar)
+
+        updateSubviewsOrdering()
+
+        toolbarContainer.mainToolbar.translatesAutoresizingMaskIntoConstraints = false
+        toolbarContainer.secondaryToolbar.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activateConstraints(constraintsForToolbarContainer(toolbarContainer))
+
+        let previousToolbarContainer: ToolbarContainer?
+        if toolControllers.count > 1 {
+            previousToolbarContainer = toolToToolbarContainer[toolControllers[toolControllers.count - 2]]
+        } else {
+            previousToolbarContainer = photoEditViewControllerToolbarContainer
+        }
+
+        if animated {
+            toolbarContainer.mainToolbar.transform = CGAffineTransformMakeTranslation(0, 124)
+            toolbarContainer.secondaryToolbar.transform = CGAffineTransformMakeTranslation(0, 44)
+
+            UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
+                previousToolbarContainer?.mainToolbar.alpha = 0.3
+                }) { _ in
+                    previousToolbarContainer?.mainToolbar.hidden = true
+                    previousToolbarContainer?.secondaryToolbar.hidden = true
+                    toolController.didMoveToParentViewController(self)
+            }
+
+            UIView.animateWithDuration(0.24, delay: 0, options: [.CurveEaseInOut], animations: {
+                toolbarContainer.mainToolbar.transform = CGAffineTransformIdentity
+                }, completion: nil)
+
+            UIView.animateWithDuration(0.12, delay: 0.16, options: [.CurveEaseInOut], animations: {
+                toolbarContainer.secondaryToolbar.transform = CGAffineTransformIdentity
+                }, completion: nil)
+        } else {
+            previousToolbarContainer?.mainToolbar.hidden = true
+            previousToolbarContainer?.secondaryToolbar.hidden = true
+            toolController.didMoveToParentViewController(self)
+        }
     }
 
     /**
@@ -242,7 +303,50 @@ import UIKit
      - parameter animated: Set this value to `true` to animate the transition. Pass `false` otherwise.
      */
     public func popToolControllerAnimated(animated: Bool) {
+        guard let toolController = toolControllers.last, toolbarContainer = toolToToolbarContainer[toolController] else {
+            return
+        }
 
+        let previousToolbarContainer: ToolbarContainer?
+        if toolControllers.count > 1 {
+            previousToolbarContainer = toolToToolbarContainer[toolControllers[toolControllers.count - 2]]
+        } else {
+            previousToolbarContainer = photoEditViewControllerToolbarContainer
+        }
+
+        toolController.willMoveToParentViewController(nil)
+
+        previousToolbarContainer?.mainToolbar.hidden = false
+        previousToolbarContainer?.secondaryToolbar.hidden = false
+
+        if animated {
+            UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
+                previousToolbarContainer?.mainToolbar.alpha = 1
+                }) { _ in
+                    toolbarContainer.mainToolbar.removeFromSuperview()
+                    toolbarContainer.secondaryToolbar.removeFromSuperview()
+                    toolController.view.removeFromSuperview()
+                    toolController.removeFromParentViewController()
+                    self.toolToToolbarContainer[toolController] = nil
+                    self.toolControllers.removeAtIndex(self.toolControllers.count - 1)
+            }
+
+            UIView.animateWithDuration(0.24, delay: 0.04, options: [.CurveEaseInOut], animations: {
+                toolbarContainer.mainToolbar.transform = CGAffineTransformMakeTranslation(0, 124)
+                }, completion: nil)
+
+            UIView.animateWithDuration(0.12, delay: 0, options: [.CurveEaseInOut], animations: {
+                toolbarContainer.secondaryToolbar.transform = CGAffineTransformMakeTranslation(0, 44)
+                }, completion: nil)
+        } else {
+            previousToolbarContainer?.mainToolbar.alpha = 1
+            toolbarContainer.mainToolbar.removeFromSuperview()
+            toolbarContainer.secondaryToolbar.removeFromSuperview()
+            toolController.view.removeFromSuperview()
+            toolController.removeFromParentViewController()
+            toolToToolbarContainer[toolController] = nil
+            toolControllers.removeAtIndex(toolControllers.count - 1)
+        }
     }
 }
 

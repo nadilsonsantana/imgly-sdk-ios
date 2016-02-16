@@ -47,6 +47,24 @@ extension InstanceFactory {
         }
     }
 
+    /**
+     Return the tool controller according to the button-type. This is used by the main menu.
+
+     - parameter actionType:         The type of the button pressed.
+     - parameter withPhotoEditModel: The photo edit model that should be passed to the tool controller.
+     - parameter configuration:      The configuration object that should be applied to the tool controller.
+
+     - returns: A tool controller according to the button-type or `nil` if no tool controller for the button-type exists.
+     */
+    public class func toolControllerForEditorActionType(actionType: MainEditorActionType, withPhotoEditModel photoEditModel: IMGLYPhotoEditMutableModel, configuration: Configuration) -> PhotoEditToolController? {
+        switch actionType {
+        case .Filter:
+            return FiltersToolController(photoEditModel: photoEditModel, configuration: configuration)
+        default:
+            return nil
+        }
+    }
+
     public class func filterEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> FilterEditorViewController {
         // swiftlint:disable force_cast
         let vc = configuration.getClassForReplacedClass(FilterEditorViewController.self).init() as! FilterEditorViewController

@@ -71,6 +71,8 @@ public typealias WillLeaveToolClosure = () -> ()
     public let saturationEditorViewControllerOptions: SliderEditorViewControllerOptions
     /// Options for the `TextEditorViewController`.
     public let textEditorViewControllerOptions: TextEditorViewControllerOptions
+    /// Options for the `ToolStackController`.
+    public let toolStackControllerOptions: ToolStackControllerOptions
 
     //  MARK: Initialization
 
@@ -106,6 +108,7 @@ public typealias WillLeaveToolClosure = () -> ()
         self.saturationEditorViewControllerOptions = builderForClosure.saturationEditorViewControllerOptions
         self.textEditorViewControllerOptions = builderForClosure.textEditorViewControllerOptions
         self.borderEditorViewControllerOptions = builderForClosure.borderEditorViewControllerOptions
+        self.toolStackControllerOptions = builderForClosure.toolStackControllerOptions
         self.classReplacingMap = builderForClosure.classReplacingMap
         super.init()
     }
@@ -145,6 +148,7 @@ public typealias WillLeaveToolClosure = () -> ()
     private var contrastEditorViewControllerOptions: SliderEditorViewControllerOptions = SliderEditorViewControllerOptions()
     private var saturationEditorViewControllerOptions: SliderEditorViewControllerOptions = SliderEditorViewControllerOptions()
     private var textEditorViewControllerOptions: TextEditorViewControllerOptions = TextEditorViewControllerOptions()
+    public var toolStackControllerOptions: ToolStackControllerOptions = ToolStackControllerOptions()
 
     /// Options for the `CameraViewController`.
     public func configureCameraViewController(builder: (CameraViewControllerOptionsBuilder -> Void)) {
@@ -227,6 +231,12 @@ public typealias WillLeaveToolClosure = () -> ()
         let builderForClosure = BorderEditorViewControllerOptionsBuilder()
         builder(builderForClosure)
         borderEditorViewControllerOptions = BorderEditorViewControllerOptions(builder: builderForClosure)
+    }
+    
+    public func configureToolStackController(builder: (ToolStackControllerOptionsBuilder -> Void)) {
+        let builderForClosure = ToolStackControllerOptionsBuilder()
+        builder(builderForClosure)
+        toolStackControllerOptions = ToolStackControllerOptions(builder: builderForClosure)
     }
 
     // MARK: Class replacement

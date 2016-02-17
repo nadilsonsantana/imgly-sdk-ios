@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, getter=isAutoEnhancementEnabled) BOOL autoEnhancementEnabled;
 @property(nonatomic) CGFloat brightness;
 @property(nonatomic) CGFloat contrast;
+@property(nonatomic, copy) NSString *effectFilterIdentifier;
+@property(nonatomic) CGFloat effectFilterIntensity;
 @property(nonatomic) CGRect normalizedCropRect;
 @property(nonatomic) CGFloat saturation;
 @property(nonatomic) CGFloat straightenAngle;

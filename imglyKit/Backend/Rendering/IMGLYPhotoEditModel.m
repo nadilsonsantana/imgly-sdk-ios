@@ -20,6 +20,8 @@
         _autoEnhancementEnabled = false;
         _brightness = 0;
         _contrast = 1;
+        _effectFilterIdentifier = @"TODO";
+        _effectFilterIntensity = 0.75;
         _normalizedCropRect = [[self class] identityNormalizedCropRect];
         _saturation = 1;
         _straightenAngle = 0;
@@ -45,6 +47,8 @@
     _autoEnhancementEnabled = photoEditModel.isAutoEnhancementEnabled;
     _brightness = photoEditModel.brightness;
     _contrast = photoEditModel.contrast;
+    _effectFilterIdentifier = photoEditModel.effectFilterIdentifier.copy;
+    _effectFilterIntensity = photoEditModel.effectFilterIntensity;
     _normalizedCropRect = photoEditModel.normalizedCropRect;
     _saturation = photoEditModel.saturation;
     _straightenAngle = photoEditModel.straightenAngle;
@@ -85,6 +89,14 @@
     }
 
     if (photoEditModel.contrast != self.contrast) {
+        return NO;
+    }
+
+    if (![photoEditModel.effectFilterIdentifier isEqualToString:self.effectFilterIdentifier]) {
+        return NO;
+    }
+
+    if (photoEditModel.effectFilterIntensity != self.effectFilterIntensity) {
         return NO;
     }
 

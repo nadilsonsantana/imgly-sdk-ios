@@ -11,6 +11,7 @@ import GLKit
 
 @objc(IMGLYPhotoEditViewControllerDelegate) public protocol PhotoEditViewControllerDelegate {
     func photoEditViewController(photoEditViewController: PhotoEditViewController, didSelectToolController toolController: PhotoEditToolController)
+    func photoEditViewControllerPopToolController(photoEditViewController: PhotoEditViewController)
 }
 
 @objc(IMGLYPhotoEditViewController) public class PhotoEditViewController: UIViewController {
@@ -183,7 +184,7 @@ import GLKit
         super.viewWillAppear(animated)
 
         loadPhotoEditModelIfNecessary()
-        updateCollectionView()
+        updateToolStackItem()
         updateBackgroundColor()
         updatePlaceholderImage()
         updateRenderedPreviewForceRender(false)
@@ -252,7 +253,7 @@ import GLKit
         }
     }
 
-    private func updateCollectionView() {
+    private func updateToolStackItem() {
         if collectionView == nil {
             let flowLayout = UICollectionViewFlowLayout()
             flowLayout.scrollDirection = .Horizontal
@@ -270,7 +271,13 @@ import GLKit
             collectionView.registerClass(SeparatorCollectionViewCell.self, forCellWithReuseIdentifier: PhotoEditViewController.SeparatorCollectionViewCellReuseIdentifier)
 
             self.collectionView = collectionView
+        }
+
+        toolStackItem.performChanges {
             toolStackItem.mainToolbarView = collectionView
+            toolStackItem.discardButton = nil
+            toolStackItem.applyButton = nil
+            toolStackItem.titleLabel?.text = Localize("EDITOR")
         }
     }
 
@@ -649,10 +656,11 @@ extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDel
             }
         } else {
             if let photoEditModel = photoEditModel, toolController = InstanceFactory.toolControllerForEditorActionType(action.editorType, withPhotoEditModel: photoEditModel, configuration: configuration) {
+                toolController.delegate = self
                 delegate?.photoEditViewController(self, didSelectToolController: toolController)
             }
         }
-        
+
         collectionView.reloadItemsAtIndexPaths([indexPath])
     }
 
@@ -661,7 +669,7 @@ extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDel
      */
     public func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
         let action = options.editorActionsDataSource.actionAtIndex(indexPath.item)
-        
+
         if action.editorType == .Magic {
             if let buttonCell = cell as? ButtonCollectionViewCell, let selectedImage = action.selectedImage {
                 if photoEditModel?.autoEnhancementEnabled ?? false {
@@ -675,5 +683,16 @@ extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDel
                 }
             }
         }
+    }
+}
+
+extension PhotoEditViewController: PhotoEditToolControllerDelegate {
+    public func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController) {
+        delegate?.photoEditViewControllerPopToolController(self)
+    }
+
+    public func photoEditToolController(photoEditToolController: PhotoEditToolController, didDiscardChangesInFavorOfPhotoEditModel photoEditModel: IMGLYPhotoEditModel) {
+        self.photoEditModel = photoEditModel.mutableCopy() as? IMGLYPhotoEditMutableModel
+        delegate?.photoEditViewControllerPopToolController(self)
     }
 }

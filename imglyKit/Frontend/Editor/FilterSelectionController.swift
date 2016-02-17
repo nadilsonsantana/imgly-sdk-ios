@@ -8,19 +8,22 @@
 
 import UIKit
 
-private let kFilterCollectionViewCellReuseIdentifier = "FilterCollectionViewCell"
-private let kFilterCollectionViewCellSize = CGSize(width: 60, height: 90)
-private let kFilterActivationDuration = NSTimeInterval(0.15)
-
-private var filterPreviews = [FilterType : UIImage]()
-
 public typealias FilterTypeSelectedBlock = (FilterType, Float) -> (Void)
 public typealias FilterTypeActiveBlock = () -> (FilterType?)
 
-@objc(IMGLYFilterSelectionController) public class FilterSelectionController: UICollectionViewController {
+@objc(IMGLYFilterSelectionController) public class FilterSelectionController: NSObject {
+
+    // MARK: - Statics
+
+    private static let FilterCollectionViewCellReuseIdentifier = "FilterCollectionViewCell"
+    private static let FilterCollectionViewCellSize = CGSize(width: 64, height: 64)
+    private static let FilterActivationDuration = NSTimeInterval(0.15)
+
+    private static var filterPreviews = [FilterType : UIImage]()
 
     // MARK: - Properties
 
+    public let collectionView: UICollectionView
     public var dataSource: FiltersDataSourceProtocol = FiltersDataSource()
     private var selectedCellIndex: Int?
     public var selectedBlock: FilterTypeSelectedBlock?
@@ -28,39 +31,32 @@ public typealias FilterTypeActiveBlock = () -> (FilterType?)
 
     // MARK: - Initializers
 
-    public init() {
+    public override init() {
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.itemSize = kFilterCollectionViewCellSize
+        flowLayout.itemSize = FilterSelectionController.FilterCollectionViewCellSize
         flowLayout.scrollDirection = .Horizontal
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
         flowLayout.minimumInteritemSpacing = 7
         flowLayout.minimumLineSpacing = 7
-        super.init(collectionViewLayout: flowLayout)
 
-        view.translatesAutoresizingMaskIntoConstraints = false
-        collectionView?.registerClass(FilterCollectionViewCell.self, forCellWithReuseIdentifier: kFilterCollectionViewCellReuseIdentifier)
-        collectionView?.backgroundColor = UIColor.clearColor()
+        collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
+        super.init()
+
+        collectionView.registerClass(FilterCollectionViewCell.self, forCellWithReuseIdentifier: FilterSelectionController.FilterCollectionViewCellReuseIdentifier)
+        collectionView.backgroundColor = UIColor.clearColor()
+        collectionView.delegate = self
+        collectionView.dataSource = self
     }
 
-    /**
-     Returns an object initialized from data in a given unarchiver.
-
-     - parameter aDecoder: An unarchiver object.
-
-     - returns: `self`, initialized using the data in decoder.
-     */
-    required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
 }
 
-extension FilterSelectionController {
-    public override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+extension FilterSelectionController: UICollectionViewDataSource {
+    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.filterCount
     }
 
-    public override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(kFilterCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
+    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(FilterSelectionController.FilterCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
 
         if let filterCell = cell as? FilterCollectionViewCell {
             let filterType = dataSource.filterTypeAtIndex(indexPath.item)
@@ -75,7 +71,7 @@ extension FilterSelectionController {
             filterCell.tickImageView.image = self.dataSource.selectedImageForFilterAtIndex(indexPath.item)
             filterCell.hideTick()
 
-            if let filterPreviewImage = filterPreviews[filterType] {
+            if let filterPreviewImage = FilterSelectionController.filterPreviews[filterType] {
                 self.updateCell(filterCell, atIndexPath: indexPath, withFilterType: filterType, forImage: filterPreviewImage)
                 filterCell.activityIndicator.stopAnimating()
             } else {
@@ -86,7 +82,7 @@ extension FilterSelectionController {
                     let filterPreviewImage = PhotoProcessor.processWithUIImage(self.dataSource.previewImageForFilterAtIndex(indexPath.item), filters: [filter])
 
                     dispatch_async(dispatch_get_main_queue()) {
-                        filterPreviews[filterType] = filterPreviewImage
+                        FilterSelectionController.filterPreviews[filterType] = filterPreviewImage
                         if let filterCell = collectionView.cellForItemAtIndexPath(indexPath) as? FilterCollectionViewCell {
                             self.updateCell(filterCell, atIndexPath: indexPath, withFilterType: filter.filterType, forImage: filterPreviewImage)
                             filterCell.activityIndicator.stopAnimating()
@@ -111,8 +107,8 @@ extension FilterSelectionController {
     }
 }
 
-extension FilterSelectionController {
-    public override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+extension FilterSelectionController: UICollectionViewDelegate {
+    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         if let layoutAttributes = collectionView.collectionViewLayout.layoutAttributesForItemAtIndexPath(indexPath) {
             let extendedCellRect = CGRectInset(layoutAttributes.frame, -60, 0)
             collectionView.scrollRectToVisible(extendedCellRect, animated: true)
@@ -127,7 +123,7 @@ extension FilterSelectionController {
 
         // get cell of previously selected filter if visible
         if let selectedCellIndex = self.selectedCellIndex, let cell = collectionView.cellForItemAtIndexPath(NSIndexPath(forItem: selectedCellIndex, inSection: 0)) as? FilterCollectionViewCell {
-            UIView.animateWithDuration(kFilterActivationDuration, animations: { () -> Void in
+            UIView.animateWithDuration(FilterSelectionController.FilterActivationDuration, animations: { () -> Void in
                 cell.hideTick()
             })
         }
@@ -138,7 +134,7 @@ extension FilterSelectionController {
         if let cell = collectionView.cellForItemAtIndexPath(indexPath) as? FilterCollectionViewCell {
             selectedCellIndex = indexPath.item
 
-            UIView.animateWithDuration(kFilterActivationDuration, animations: { () -> Void in
+            UIView.animateWithDuration(FilterSelectionController.FilterActivationDuration, animations: { () -> Void in
                 cell.showTick()
             })
         }

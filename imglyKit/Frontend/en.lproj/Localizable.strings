@@ -27,7 +27,8 @@
 "Stop recording video" = "Stop recording video";
 
 // Editor
-"Photol" = "Photo";
+"Photo" = "Photo";
+"EDITOR" = "EDITOR";
 
 // Main Editor
 "Editor" = "Editor";
@@ -45,6 +46,7 @@
 
 // Filter Editor
 "Filter Intensity" = "Filter Intensity";
+"FILTERS" = "FILTERS";
 
 // Stickers Editor
 "Rotate left" = "Rotate left";

@@ -23,6 +23,8 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
 @dynamic autoEnhancementEnabled;
 @dynamic brightness;
 @dynamic contrast;
+@dynamic effectFilterIdentifier;
+@dynamic effectFilterIntensity;
 @dynamic normalizedCropRect;
 @dynamic saturation;
 @dynamic straightenAngle;
@@ -73,6 +75,22 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
     if (_contrast != contrast) {
         [self performChangesWithBlock:^{
           _contrast = contrast;
+        }];
+    }
+}
+
+- (void)setEffectFilterIdentifier:(NSString *)effectFilterIdentifier {
+    if (![_effectFilterIdentifier isEqualToString:effectFilterIdentifier]) {
+        [self performChangesWithBlock:^{
+          _effectFilterIdentifier = effectFilterIdentifier.copy;
+        }];
+    }
+}
+
+- (void)setEffectFilterIntensity:(CGFloat)effectFilterIntensity {
+    if (_effectFilterIntensity != effectFilterIntensity) {
+        [self performChangesWithBlock:^{
+          _effectFilterIntensity = effectFilterIntensity;
         }];
     }
 }

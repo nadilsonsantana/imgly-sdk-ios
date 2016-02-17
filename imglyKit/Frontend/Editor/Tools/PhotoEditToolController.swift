@@ -8,6 +8,11 @@
 
 import UIKit
 
+@objc(IMGLYPhotoEditToolControllerDelegate) public protocol PhotoEditToolControllerDelegate {
+    func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController)
+    func photoEditToolController(photoEditToolController: PhotoEditToolController, didDiscardChangesInFavorOfPhotoEditModel photoEditModel: IMGLYPhotoEditModel)
+}
+
 /**
  *  A `PhotoEditToolController` is the base class for any tool controllers. Subclass this class if you
  *  want to add additional tools to the editor.
@@ -19,9 +24,11 @@ import UIKit
     /// The render mode that the preview image should be rendered with when this tool is active.
     public var preferredRenderMode: IMGLYRenderMode
 
-    private let photoEditModel: IMGLYPhotoEditMutableModel
-    private let uneditedPhotoEditModel: IMGLYPhotoEditModel
+    let photoEditModel: IMGLYPhotoEditMutableModel
+    let uneditedPhotoEditModel: IMGLYPhotoEditModel
     private let configuration: Configuration
+
+    weak var delegate: PhotoEditToolControllerDelegate?
 
     // MARK: - Initializers
 
@@ -53,7 +60,6 @@ import UIKit
      */
     public override func viewDidLoad() {
         super.viewDidLoad()
-
     }
 
     /**

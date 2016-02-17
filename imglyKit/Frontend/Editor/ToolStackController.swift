@@ -28,6 +28,7 @@ import UIKit
 
     private var photoEditViewControllerConstraints: [NSLayoutConstraint]?
     private var photoEditViewControllerToolbarContainer: ToolbarContainer?
+    private var toolbarShadowView: UIView?
 
     /// The tools that are currently on the stack. The top controller is at index `n-1`, where `n` is the number of items in the array.
     public private(set) var toolControllers = [PhotoEditToolController]()
@@ -93,6 +94,11 @@ import UIKit
         view.addSubview(toolbarContainer.secondaryToolbar)
         photoEditViewControllerToolbarContainer = toolbarContainer
 
+        let shadowView = UIView()
+        shadowView.backgroundColor = UIColor.blackColor()
+        view.addSubview(shadowView)
+        toolbarShadowView = shadowView
+
         updateSubviewsOrdering()
 
         view.setNeedsUpdateConstraints()
@@ -103,6 +109,7 @@ import UIKit
 
         if let toolbarContainer = photoEditViewControllerToolbarContainer where photoEditViewControllerConstraints == nil {
             photoEditViewController.view.translatesAutoresizingMaskIntoConstraints = false
+            toolbarShadowView?.translatesAutoresizingMaskIntoConstraints = false
             toolbarContainer.mainToolbar.translatesAutoresizingMaskIntoConstraints = false
             toolbarContainer.secondaryToolbar.translatesAutoresizingMaskIntoConstraints = false
 
@@ -112,6 +119,13 @@ import UIKit
             constraints.append(NSLayoutConstraint(item: photoEditViewController.view, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: photoEditViewController.view, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
             constraints.append(NSLayoutConstraint(item: photoEditViewController.view, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
+
+            if let toolbarShadowView = toolbarShadowView {
+                constraints.append(NSLayoutConstraint(item: toolbarShadowView, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
+                constraints.append(NSLayoutConstraint(item: toolbarShadowView, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
+                constraints.append(NSLayoutConstraint(item: toolbarShadowView, attribute: .Top, relatedBy: .Equal, toItem: toolbarContainer.mainToolbar, attribute: .Top, multiplier: 1, constant: 0))
+                constraints.append(NSLayoutConstraint(item: toolbarShadowView, attribute: .Bottom, relatedBy: .Equal, toItem: toolbarContainer.mainToolbar, attribute: .Bottom, multiplier: 1, constant: 0))
+            }
 
             constraints.appendContentsOf(constraintsForToolbarContainer(toolbarContainer))
 
@@ -197,6 +211,10 @@ import UIKit
             view.removeFromSuperview()
         }
 
+        for view in toolbarContainer.secondaryToolbar.subviews {
+            view.removeFromSuperview()
+        }
+
         // Restore
         if let toolbarView = toolStackItem.mainToolbarView {
             toolbarContainer.mainToolbar.addSubview(toolbarView)
@@ -211,6 +229,42 @@ import UIKit
 
             NSLayoutConstraint.activateConstraints(constraints)
         }
+
+        var constraints = [NSLayoutConstraint]()
+
+        if let discardButton = toolStackItem.discardButton {
+            discardButton.translatesAutoresizingMaskIntoConstraints = false
+            toolbarContainer.secondaryToolbar.addSubview(discardButton)
+
+            constraints.append(NSLayoutConstraint(item: discardButton, attribute: .Left, relatedBy: .Equal, toItem: toolbarContainer.secondaryToolbar, attribute: .Left, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: discardButton, attribute: .CenterY, relatedBy: .Equal, toItem: toolbarContainer.secondaryToolbar, attribute: .CenterY, multiplier: 1, constant: 0))
+        }
+
+        if let applyButton = toolStackItem.applyButton {
+            applyButton.translatesAutoresizingMaskIntoConstraints = false
+            toolbarContainer.secondaryToolbar.addSubview(applyButton)
+
+            constraints.append(NSLayoutConstraint(item: applyButton, attribute: .Right, relatedBy: .Equal, toItem: toolbarContainer.secondaryToolbar, attribute: .Right, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: applyButton, attribute: .CenterY, relatedBy: .Equal, toItem: toolbarContainer.secondaryToolbar, attribute: .CenterY, multiplier: 1, constant: 0))
+        }
+
+        if let titleLabel = toolStackItem.titleLabel {
+            titleLabel.translatesAutoresizingMaskIntoConstraints = false
+            toolbarContainer.secondaryToolbar.addSubview(titleLabel)
+
+            constraints.append(NSLayoutConstraint(item: titleLabel, attribute: .CenterX, relatedBy: .Equal, toItem: toolbarContainer.secondaryToolbar, attribute: .CenterX, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: titleLabel, attribute: .CenterY, relatedBy: .Equal, toItem: toolbarContainer.secondaryToolbar, attribute: .CenterY, multiplier: 1, constant: 0))
+
+            if let discardButton = toolStackItem.discardButton {
+                constraints.append(NSLayoutConstraint(item: titleLabel, attribute: .Left, relatedBy: .GreaterThanOrEqual, toItem: discardButton, attribute: .Right, multiplier: 1, constant: 0))
+            }
+
+            if let applyButton = toolStackItem.applyButton {
+                constraints.append(NSLayoutConstraint(item: applyButton, attribute: .Left, relatedBy: .GreaterThanOrEqual, toItem: titleLabel, attribute: .Right, multiplier: 1, constant: 0))
+            }
+        }
+
+        NSLayoutConstraint.activateConstraints(constraints)
     }
 
     private func updateSubviewsOrdering() {
@@ -221,6 +275,10 @@ import UIKit
         }
 
         if let toolbarContainer = photoEditViewControllerToolbarContainer {
+            if let toolbarShadowView = toolbarShadowView {
+                view.bringSubviewToFront(toolbarShadowView)
+            }
+
             view.bringSubviewToFront(toolbarContainer.mainToolbar)
             view.bringSubviewToFront(toolbarContainer.secondaryToolbar)
         }
@@ -239,7 +297,7 @@ import UIKit
     Pushes a tool controller onto the receiver's stack and updates the display.
 
     - parameter toolController:     The tool controller to push onto the stack. If the tool controller is already on the tool stack, this method throws an exception.
-    - parameter animated: Specify `true` to animate the transition and `false` if you do not want the transition to be animated.
+    - parameter animated: Specify `true` to animate the transition and `false` if you do not want the transition to be animated
     */
     public func pushToolController(toolController: PhotoEditToolController, animated: Bool) {
         if toolControllers.contains(toolController) {
@@ -353,5 +411,9 @@ import UIKit
 extension ToolStackController: PhotoEditViewControllerDelegate {
     public func photoEditViewController(photoEditViewController: PhotoEditViewController, didSelectToolController toolController: PhotoEditToolController) {
         pushToolController(toolController, animated: true)
+    }
+
+    public func photoEditViewControllerPopToolController(photoEditViewController: PhotoEditViewController) {
+        popToolControllerAnimated(true)
     }
 }

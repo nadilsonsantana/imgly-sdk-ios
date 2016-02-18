@@ -10,6 +10,8 @@ import UIKit
 
 @objc(IMGLYIconCaptionCollectionViewCell) public class IconCaptionCollectionViewCell: UICollectionViewCell {
 
+    // MARK: - Properties
+    
     public let imageView = UIImageView()
     public let captionLabel = UILabel()
     public let selectionIndicator = UIView()
@@ -64,7 +66,7 @@ import UIKit
 
         contentView.addSubview(captionLabel)
         captionLabel.translatesAutoresizingMaskIntoConstraints = false
-        captionLabel.textColor = UIColor.whiteColor()
+        captionLabel.textColor = UIColor.whiteColor().colorWithAlphaComponent(0.7)
         captionLabel.font = UIFont.systemFontOfSize(11)
         constraints.append(NSLayoutConstraint(item: captionLabel, attribute: .CenterX, relatedBy: .Equal, toItem: contentView, attribute: .CenterX, multiplier: 1, constant: 0))
         constraints.append(NSLayoutConstraint(item: captionLabel, attribute: .Bottom, relatedBy: .Equal, toItem: contentView, attribute: .Bottom, multiplier: 1, constant: -12))

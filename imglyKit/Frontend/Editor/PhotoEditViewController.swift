@@ -244,6 +244,15 @@ import GLKit
 
     // MARK: - Setup
 
+    internal func updateLayoutForNewToolController() {
+        previewViewScrollingContainerLayoutValid = false
+        updatePreviewContainerLayout()
+        previewViewScrollingContainer?.zoomScale = 1
+        view.layoutIfNeeded()
+        updateScrollViewContentSize()
+        updateBackgroundColor()
+    }
+
     private func loadPhotoEditModelIfNecessary() {
         if photoEditModel == nil {
             let editModel = IMGLYPhotoEditMutableModel()

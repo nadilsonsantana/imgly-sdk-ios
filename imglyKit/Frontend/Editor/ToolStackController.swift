@@ -344,6 +344,8 @@ import UIKit
 
             UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
                 previousToolbarContainer?.mainToolbar.alpha = 0.3
+                self.photoEditViewController.updateLayoutForNewToolController()
+
                 }) { _ in
                     previousToolbarContainer?.mainToolbar.hidden = true
                     previousToolbarContainer?.secondaryToolbar.hidden = true

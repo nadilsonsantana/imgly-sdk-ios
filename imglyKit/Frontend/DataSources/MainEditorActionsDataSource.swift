@@ -42,7 +42,7 @@ import UIKit
     */
     public override init() {
         super.init()
-        items = self.itemsForAvailableActions([ .Magic, .Separator, .Crop, .Orientation, .Separator, .Filter, .Brightness, .Contrast, .Saturation, .Separator, .Text, .Stickers, .Focus, .Border ])
+        items = self.itemsForAvailableActions([ .Crop, .Orientation, .Separator, .Filter, .Adjust, .Separator, .Text, .Sticker, .Separator, .Focus, .Frame, .Magic ])
     }
 
     /**
@@ -84,15 +84,47 @@ import UIKit
         var actions: [MainEditorAction] = []
         for actionType in types {
             switch actionType {
+            case .Crop:
+                actions.append(MainEditorAction(title: Localize("Crop"),
+                    image: UIImage(named: "icon_option_crop", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Crop))
+            case .Orientation:
+                actions.append(MainEditorAction(title: Localize("Orientation"),
+                    image: UIImage(named: "icon_option_orientation", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Orientation))
+            case .Filter:
+                actions.append(MainEditorAction(title: Localize("Filter"),
+                    image: UIImage(named: "icon_option_filter", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Filter))
+            case .Adjust:
+                actions.append(MainEditorAction(title: Localize("Adjust"),
+                    image: UIImage(named: "icon_option_adjust", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Adjust))
+            case .Text:
+                actions.append(MainEditorAction(title: Localize("Text"),
+                    image: UIImage(named: "icon_option_text", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Text))
+            case .Sticker:
+                actions.append(MainEditorAction(title: Localize("Sticker"),
+                    image: UIImage(named: "icon_option_sticker", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Sticker))
+            case .Focus:
+                actions.append(MainEditorAction(title: Localize("Focus"),
+                    image: UIImage(named: "icon_option_focus", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Focus))
+            case .Frame:
+                actions.append(MainEditorAction(title: Localize("Frame"),
+                    image: UIImage(named: "icon_option_frame", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
+                    editorType: .Frame))
             case .Magic:
                 actions.append(MainEditorAction(title: Localize("Magic"),
                     image: UIImage(named: "icon_option_magic", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
                     selectedImage: UIImage(named: "icon_option_magic_active", inBundle: bundle, compatibleWithTraitCollection: nil)!,
                     editorType: .Magic))
-            case .Filter:
-                actions.append(MainEditorAction(title: Localize("Filter"),
-                    image: UIImage(named: "icon_option_filters", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
-                    editorType: .Filter))
+            case .Separator:
+                actions.append(MainEditorAction(title: nil, image: nil, editorType: .Separator))
+
+            // TODO: Remove
             case .Stickers:
                 actions.append(MainEditorAction(title: Localize("Stickers"),
                     image: UIImage(named: "icon_option_sticker", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
@@ -101,18 +133,6 @@ import UIKit
                 actions.append(MainEditorAction(title: Localize("Border"),
                     image: UIImage(named: "icon_option_sticker", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
                     editorType: .Border))
-            case .Orientation:
-                actions.append(MainEditorAction(title: Localize("Orientation"),
-                    image: UIImage(named: "icon_option_orientation", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
-                    editorType: .Orientation))
-            case .Focus:
-                actions.append(MainEditorAction(title: Localize("Focus"),
-                    image: UIImage(named: "icon_option_focus", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
-                    editorType: .Focus))
-            case .Crop:
-                actions.append(MainEditorAction(title: Localize("Crop"),
-                    image: UIImage(named: "icon_option_crop", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
-                    editorType: .Crop))
             case .Brightness:
                 actions.append(MainEditorAction(title: Localize("Brightness"),
                     image: UIImage(named: "icon_option_brightness", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
@@ -125,12 +145,6 @@ import UIKit
                 actions.append(MainEditorAction(title: Localize("Saturation"),
                     image: UIImage(named: "icon_option_saturation", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
                     editorType: .Saturation))
-            case .Text:
-                actions.append(MainEditorAction(title: Localize("Text"),
-                    image: UIImage(named: "icon_option_text", inBundle: bundle, compatibleWithTraitCollection: nil)!.imageWithRenderingMode(.AlwaysTemplate),
-                    editorType: .Text))
-            case .Separator:
-                actions.append(MainEditorAction(title: nil, image: nil, editorType: .Separator))
             }
         }
 

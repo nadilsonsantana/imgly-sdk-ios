@@ -58,8 +58,22 @@ extension InstanceFactory {
      */
     public class func toolControllerForEditorActionType(actionType: MainEditorActionType, withPhotoEditModel photoEditModel: IMGLYPhotoEditMutableModel, configuration: Configuration) -> PhotoEditToolController? {
         switch actionType {
+        case .Crop:
+            return CropToolController(photoEditModel: photoEditModel, configuration: configuration)
+        case .Orientation:
+            return OrientationToolController(photoEditModel: photoEditModel, configuration: configuration)
         case .Filter:
-            return FiltersToolController(photoEditModel: photoEditModel, configuration: configuration)
+            return FilterToolController(photoEditModel: photoEditModel, configuration: configuration)
+        case .Adjust:
+            return AdjustToolController(photoEditModel: photoEditModel, configuration: configuration)
+        case .Text:
+            return TextToolController(photoEditModel: photoEditModel, configuration: configuration)
+        case .Sticker:
+            return StickerToolController(photoEditModel: photoEditModel, configuration: configuration)
+        case .Focus:
+            return FocusToolController(photoEditModel: photoEditModel, configuration: configuration)
+        case .Frame:
+            return FrameToolController(photoEditModel: photoEditModel, configuration: configuration)
         default:
             return nil
         }

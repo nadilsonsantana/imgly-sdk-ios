@@ -42,6 +42,8 @@ public typealias FilterTypeActiveBlock = () -> (FilterType?)
         collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
         super.init()
 
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.registerClass(FilterCollectionViewCell.self, forCellWithReuseIdentifier: FilterSelectionController.FilterCollectionViewCellReuseIdentifier)
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.delegate = self

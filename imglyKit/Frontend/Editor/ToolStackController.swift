@@ -306,6 +306,7 @@ import UIKit
 
         toolControllers.append(toolController)
         addChildViewController(toolController)
+        toolController.view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(toolController.view)
 
         let toolbarContainer = newToolbarContainer()
@@ -320,7 +321,15 @@ import UIKit
         toolbarContainer.mainToolbar.translatesAutoresizingMaskIntoConstraints = false
         toolbarContainer.secondaryToolbar.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activateConstraints(constraintsForToolbarContainer(toolbarContainer))
+        var constraints = [NSLayoutConstraint]()
+        constraints.appendContentsOf(constraintsForToolbarContainer(toolbarContainer))
+
+        constraints.append(NSLayoutConstraint(item: toolController.view, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolController.view, attribute: .Top, relatedBy: .Equal, toItem: view, attribute: .Top, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolController.view, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
+        constraints.append(NSLayoutConstraint(item: toolController.view, attribute: .Bottom, relatedBy: .Equal, toItem: toolbarShadowView, attribute: .Top, multiplier: 1, constant: 0))
+
+        NSLayoutConstraint.activateConstraints(constraints)
 
         let previousToolbarContainer: ToolbarContainer?
         if toolControllers.count > 1 {

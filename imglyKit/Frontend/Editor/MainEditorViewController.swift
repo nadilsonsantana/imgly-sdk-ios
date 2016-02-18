@@ -14,18 +14,23 @@ import UIKit
 }
 
 @objc public enum MainEditorActionType: Int {
-    case Magic
+    case Crop
+    case Orientation
     case Filter
+    case Adjust
+    case Text
+    case Sticker
+    case Focus
+    case Frame
+    case Magic
+    case Separator
+
+    // TODO: Remove
     case Stickers
     case Border
-    case Orientation
-    case Focus
-    case Crop
     case Brightness
     case Contrast
     case Saturation
-    case Text
-    case Separator
 }
 
 public typealias EditorCompletionBlock = (EditorResult, UIImage?) -> Void

@@ -13,8 +13,8 @@ import UIKit
     // MARK: - UIViewController
 
     /**
-    :nodoc:
-    */
+     :nodoc:
+     */
     public override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -23,6 +23,15 @@ import UIKit
             toolStackItem.applyButton?.addTarget(self, action: "apply:", forControlEvents: .TouchUpInside)
             toolStackItem.discardButton?.addTarget(self, action: "discard:", forControlEvents: .TouchUpInside)
         }
+    }
+
+    // MARK: - PhotoEditToolController
+
+    /**
+     :nodoc:
+     */
+    public override var wantsDefaultPreviewView: Bool {
+        return false
     }
 
     // MARK: - Actions

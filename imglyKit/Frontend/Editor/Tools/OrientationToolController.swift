@@ -25,6 +25,15 @@ import UIKit
         }
     }
 
+    // MARK: - PhotoEditToolController
+
+    /**
+    :nodoc:
+    */
+    public override var wantsDefaultPreviewView: Bool {
+        return false
+    }
+
     // MARK: - Actions
 
     @objc private func apply(sender: UIButton) {

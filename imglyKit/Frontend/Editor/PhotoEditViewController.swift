@@ -12,6 +12,7 @@ import GLKit
 @objc(IMGLYPhotoEditViewControllerDelegate) public protocol PhotoEditViewControllerDelegate {
     func photoEditViewController(photoEditViewController: PhotoEditViewController, didSelectToolController toolController: PhotoEditToolController)
     func photoEditViewControllerPopToolController(photoEditViewController: PhotoEditViewController)
+    func photoEditViewControllerCurrentEditingTool(photoEditViewController: PhotoEditViewController) -> PhotoEditToolController?
 }
 
 @objc(IMGLYPhotoEditViewController) public class PhotoEditViewController: UIViewController {
@@ -89,8 +90,6 @@ import GLKit
     }
 
     private var baseWorkCIImage: CIImage?
-
-    private var currentEditingTool: PhotoEditToolController?
 
     private var mainRenderer: PhotoEditRenderer?
 
@@ -189,7 +188,7 @@ import GLKit
         updatePlaceholderImage()
         updateRenderedPreviewForceRender(false)
     }
-
+    
     /**
      :nodoc:
      */
@@ -291,7 +290,7 @@ import GLKit
     }
 
     private func updateBackgroundColor() {
-        view.backgroundColor = currentEditingTool?.preferredPreviewBackgroundColor ?? UIColor.blackColor()
+        view.backgroundColor = delegate?.photoEditViewControllerCurrentEditingTool(self)?.preferredPreviewBackgroundColor ?? UIColor.blackColor()
     }
 
     private func loadBaseImageIfNecessary() {
@@ -337,7 +336,7 @@ import GLKit
         }
     }
 
-    private func updateLastKnownImageSize() {
+    internal func updateLastKnownImageSize() {
         let workImageSize: CGSize
 
         if let renderer = mainRenderer {
@@ -397,10 +396,6 @@ import GLKit
 
         view.sendSubviewToBack(previewViewScrollingContainer)
 
-        if let currentEditingTool = currentEditingTool {
-            view.bringSubviewToFront(currentEditingTool.view)
-        }
-
         if let mainPreviewView = mainPreviewView {
             previewViewScrollingContainer.sendSubviewToBack(mainPreviewView)
         }
@@ -428,11 +423,9 @@ import GLKit
 
         var constraints = [NSLayoutConstraint]()
 
-        let previewViewInsets: UIEdgeInsets
-        if let currentEditingTool = currentEditingTool {
-            previewViewInsets = currentEditingTool.preferredPreviewViewInsets
-        } else {
-            previewViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 110, right: 0)
+        var previewViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 110, right: 0)
+        if let currentEditingTool = delegate?.photoEditViewControllerCurrentEditingTool(self) {
+            previewViewInsets = previewViewInsets + currentEditingTool.preferredPreviewViewInsets
         }
 
         constraints.append(NSLayoutConstraint(item: previewViewScrollingContainer, attribute: .Left, relatedBy: .Equal, toItem: previewViewScrollingContainer.superview, attribute: .Left, multiplier: 1, constant: previewViewInsets.left))
@@ -445,12 +438,12 @@ import GLKit
         previewViewScrollingContainerLayoutValid = true
     }
 
-    private func updateRenderedPreviewForceRender(forceRender: Bool) {
-        mainRenderer?.renderMode = currentEditingTool?.preferredRenderMode ?? .All
+    internal func updateRenderedPreviewForceRender(forceRender: Bool) {
+        mainRenderer?.renderMode = delegate?.photoEditViewControllerCurrentEditingTool(self)?.preferredRenderMode ?? .All
 
         let updatePreviewView: Bool
 
-        if let currentEditingTool = currentEditingTool where !currentEditingTool.wantsDefaultPreviewView {
+        if let currentEditingTool = delegate?.photoEditViewControllerCurrentEditingTool(self) where !currentEditingTool.wantsDefaultPreviewView {
             updatePreviewView = false
         } else {
             updatePreviewView = baseWorkUIImage == nil ? false : true

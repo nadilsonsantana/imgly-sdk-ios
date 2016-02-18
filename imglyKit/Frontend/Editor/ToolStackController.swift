@@ -104,6 +104,46 @@ import UIKit
         view.setNeedsUpdateConstraints()
     }
 
+    /**
+     :nodoc:
+     */
+    public override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+
+        let topChildViewController = toolControllers.last ?? photoEditViewController
+        topChildViewController.beginAppearanceTransition(true, animated: animated)
+    }
+
+    /**
+     :nodoc:
+     */
+    public override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+
+        let topChildViewController = toolControllers.last ?? photoEditViewController
+        topChildViewController.endAppearanceTransition()
+    }
+
+    /**
+     :nodoc:
+     */
+    public override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        let topChildViewController = toolControllers.last ?? photoEditViewController
+        topChildViewController.beginAppearanceTransition(false, animated: animated)
+    }
+
+    /**
+     :nodoc:
+     */
+    public override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        let topChildViewController = toolControllers.last ?? photoEditViewController
+        topChildViewController.endAppearanceTransition()
+    }
+
     public override func updateViewConstraints() {
         super.updateViewConstraints()
 
@@ -164,6 +204,10 @@ import UIKit
 
     public override func childViewControllerForStatusBarStyle() -> UIViewController? {
         return photoEditViewController
+    }
+
+    public override func shouldAutomaticallyForwardAppearanceMethods() -> Bool {
+        return false
     }
 
     /**
@@ -304,11 +348,19 @@ import UIKit
             fatalError("Trying to push a tool controller that is already on the tool stack.")
         }
 
+        // Tell current top tool controller (or `photoEditViewController` if no tool is pushed)
+        // that it is about to disappear
+        let topChildViewController = toolControllers.last ?? photoEditViewController
+        topChildViewController.beginAppearanceTransition(false, animated: animated)
+
+        // Add child view controller, forward appearance methods and add views
         toolControllers.append(toolController)
         addChildViewController(toolController)
+        toolController.beginAppearanceTransition(true, animated: animated)
         toolController.view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(toolController.view)
 
+        // Create new toolbar container for new tool controller
         let toolbarContainer = newToolbarContainer()
         toolToToolbarContainer[toolController] = toolbarContainer
         updateToolbarContainer(toolbarContainer, forToolStackItem: toolController.toolStackItem)
@@ -321,6 +373,7 @@ import UIKit
         toolbarContainer.mainToolbar.translatesAutoresizingMaskIntoConstraints = false
         toolbarContainer.secondaryToolbar.translatesAutoresizingMaskIntoConstraints = false
 
+        // Add constraints for new toolbar container
         var constraints = [NSLayoutConstraint]()
         constraints.appendContentsOf(constraintsForToolbarContainer(toolbarContainer))
 
@@ -331,6 +384,7 @@ import UIKit
 
         NSLayoutConstraint.activateConstraints(constraints)
 
+        // Fetch toolbar that's 'behind' the toolbar that's about to be pushed
         let previousToolbarContainer: ToolbarContainer?
         if toolControllers.count > 1 {
             previousToolbarContainer = toolToToolbarContainer[toolControllers[toolControllers.count - 2]]
@@ -338,31 +392,42 @@ import UIKit
             previousToolbarContainer = photoEditViewControllerToolbarContainer
         }
 
+        // This will be executed regardless of animating the transition or not
+        let cleanupClosure = {
+            previousToolbarContainer?.mainToolbar.hidden = true
+            previousToolbarContainer?.secondaryToolbar.hidden = true
+            toolController.didMoveToParentViewController(self)
+            toolController.endAppearanceTransition()
+            topChildViewController.endAppearanceTransition()
+            self.photoEditViewController.updateLastKnownImageSize()
+            self.photoEditViewController.updateRenderedPreviewForceRender(false)
+        }
+
         if animated {
+            // Move toolbars offscreen
             toolbarContainer.mainToolbar.transform = CGAffineTransformMakeTranslation(0, 124)
             toolbarContainer.secondaryToolbar.transform = CGAffineTransformMakeTranslation(0, 44)
 
+            // Fade out toolbar that's 'behind' the newly pushed toolbar and update layout
             UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
                 previousToolbarContainer?.mainToolbar.alpha = 0.3
                 self.photoEditViewController.updateLayoutForNewToolController()
-
                 }) { _ in
-                    previousToolbarContainer?.mainToolbar.hidden = true
-                    previousToolbarContainer?.secondaryToolbar.hidden = true
-                    toolController.didMoveToParentViewController(self)
+                    cleanupClosure()
             }
 
+            // Move main toolbar onscreen
             UIView.animateWithDuration(0.24, delay: 0, options: [.CurveEaseInOut], animations: {
                 toolbarContainer.mainToolbar.transform = CGAffineTransformIdentity
                 }, completion: nil)
 
+            // Move secondary toolbar onscreen
             UIView.animateWithDuration(0.12, delay: 0.16, options: [.CurveEaseInOut], animations: {
                 toolbarContainer.secondaryToolbar.transform = CGAffineTransformIdentity
                 }, completion: nil)
         } else {
-            previousToolbarContainer?.mainToolbar.hidden = true
-            previousToolbarContainer?.secondaryToolbar.hidden = true
-            toolController.didMoveToParentViewController(self)
+            photoEditViewController.updateLayoutForNewToolController()
+            cleanupClosure()
         }
     }
 
@@ -376,6 +441,7 @@ import UIKit
             return
         }
 
+        // Fetch toolbar that's 'behind' the toolbar that's about to be popped
         let previousToolbarContainer: ToolbarContainer?
         if toolControllers.count > 1 {
             previousToolbarContainer = toolToToolbarContainer[toolControllers[toolControllers.count - 2]]
@@ -383,38 +449,56 @@ import UIKit
             previousToolbarContainer = photoEditViewControllerToolbarContainer
         }
 
-        toolController.willMoveToParentViewController(nil)
+        toolToToolbarContainer[toolController] = nil
+        toolControllers.removeAtIndex(self.toolControllers.count - 1)
 
+        // Tell tool controller (or `photoEditViewController`) that's 'behind' the view controller that is
+        // about to be popped, that it is about to appear
+        let topChildViewController = toolControllers.last ?? photoEditViewController
+        topChildViewController.beginAppearanceTransition(true, animated: animated)
+
+        // Tell tool controller that will be popped that it is about to disappear
+        toolController.willMoveToParentViewController(nil)
+        toolController.beginAppearanceTransition(false, animated: animated)
+
+        // Show toolbars that are about to become visible
         previousToolbarContainer?.mainToolbar.hidden = false
         previousToolbarContainer?.secondaryToolbar.hidden = false
 
-        if animated {
-            UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
-                previousToolbarContainer?.mainToolbar.alpha = 1
-                }) { _ in
-                    toolbarContainer.mainToolbar.removeFromSuperview()
-                    toolbarContainer.secondaryToolbar.removeFromSuperview()
-                    toolController.view.removeFromSuperview()
-                    toolController.removeFromParentViewController()
-                    self.toolToToolbarContainer[toolController] = nil
-                    self.toolControllers.removeAtIndex(self.toolControllers.count - 1)
-            }
-
-            UIView.animateWithDuration(0.24, delay: 0.04, options: [.CurveEaseInOut], animations: {
-                toolbarContainer.mainToolbar.transform = CGAffineTransformMakeTranslation(0, 124)
-                }, completion: nil)
-
-            UIView.animateWithDuration(0.12, delay: 0, options: [.CurveEaseInOut], animations: {
-                toolbarContainer.secondaryToolbar.transform = CGAffineTransformMakeTranslation(0, 44)
-                }, completion: nil)
-        } else {
-            previousToolbarContainer?.mainToolbar.alpha = 1
+        // This will be executed regardless of animating the transition or not
+        let cleanupClosure = {
             toolbarContainer.mainToolbar.removeFromSuperview()
             toolbarContainer.secondaryToolbar.removeFromSuperview()
             toolController.view.removeFromSuperview()
             toolController.removeFromParentViewController()
-            toolToToolbarContainer[toolController] = nil
-            toolControllers.removeAtIndex(toolControllers.count - 1)
+            toolController.endAppearanceTransition()
+            topChildViewController.endAppearanceTransition()
+            self.photoEditViewController.updateLastKnownImageSize()
+            self.photoEditViewController.updateRenderedPreviewForceRender(false)
+        }
+
+        if animated {
+            // Fade in toolbar that's 'behind' the popped toolbar and update layout
+            UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
+                previousToolbarContainer?.mainToolbar.alpha = 1
+                self.photoEditViewController.updateLayoutForNewToolController()
+                }) { _ in
+                    cleanupClosure()
+            }
+
+            // Move main toolbar offscreen
+            UIView.animateWithDuration(0.24, delay: 0.04, options: [.CurveEaseInOut], animations: {
+                toolbarContainer.mainToolbar.transform = CGAffineTransformMakeTranslation(0, 124)
+                }, completion: nil)
+
+            // Move secondary toolbar offscreen
+            UIView.animateWithDuration(0.12, delay: 0, options: [.CurveEaseInOut], animations: {
+                toolbarContainer.secondaryToolbar.transform = CGAffineTransformMakeTranslation(0, 44)
+                }, completion: nil)
+        } else {
+            photoEditViewController.updateLayoutForNewToolController()
+            previousToolbarContainer?.mainToolbar.alpha = 1
+            cleanupClosure()
         }
     }
 }
@@ -426,5 +510,9 @@ extension ToolStackController: PhotoEditViewControllerDelegate {
 
     public func photoEditViewControllerPopToolController(photoEditViewController: PhotoEditViewController) {
         popToolControllerAnimated(true)
+    }
+
+    public func photoEditViewControllerCurrentEditingTool(photoEditViewController: PhotoEditViewController) -> PhotoEditToolController? {
+        return toolControllers.last
     }
 }

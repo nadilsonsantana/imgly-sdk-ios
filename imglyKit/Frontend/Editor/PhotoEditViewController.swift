@@ -188,7 +188,7 @@ import GLKit
         updatePlaceholderImage()
         updateRenderedPreviewForceRender(false)
     }
-    
+
     /**
      :nodoc:
      */
@@ -266,7 +266,6 @@ import GLKit
             let flowLayout = UICollectionViewFlowLayout()
             flowLayout.scrollDirection = .Horizontal
             flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-            flowLayout.minimumInteritemSpacing = 8
             flowLayout.minimumLineSpacing = 8
 
             let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)
@@ -694,7 +693,7 @@ extension PhotoEditViewController: PhotoEditToolControllerDelegate {
     }
 
     public func photoEditToolController(photoEditToolController: PhotoEditToolController, didDiscardChangesInFavorOfPhotoEditModel photoEditModel: IMGLYPhotoEditModel) {
-        self.photoEditModel = photoEditModel.mutableCopy() as? IMGLYPhotoEditMutableModel
+        self.photoEditModel?.copyValuesFromModel(photoEditModel)
         delegate?.photoEditViewControllerPopToolController(self)
     }
 }

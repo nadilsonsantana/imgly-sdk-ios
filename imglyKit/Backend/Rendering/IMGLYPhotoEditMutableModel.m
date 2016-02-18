@@ -45,6 +45,12 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
     }
 }
 
+- (void)copyValuesFromModel:(IMGLYPhotoEditModel *)photoEditModel {
+    [self performChangesWithBlock:^{
+      [self _copyValuesFromModel:photoEditModel];
+    }];
+}
+
 #pragma mark - Accessors
 
 - (void)setAppliedOrientation:(IMGLYOrientation)appliedOrientation {

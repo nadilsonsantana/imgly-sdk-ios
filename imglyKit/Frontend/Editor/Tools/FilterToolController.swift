@@ -10,6 +10,8 @@ import UIKit
 
 @objc(IMGLYFilterToolController) public class FilterToolController: PhotoEditToolController {
 
+    // MARK: - Properties
+
     private lazy var filterSelectionController = FilterSelectionController()
 
     // MARK: - UIViewController

@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic) CGFloat straightenAngle;
 
 - (void)performChangesWithBlock:(void (^)())changesBlock;
+- (void)copyValuesFromModel:(IMGLYPhotoEditModel *)photoEditModel;
 
 NS_ASSUME_NONNULL_END
 

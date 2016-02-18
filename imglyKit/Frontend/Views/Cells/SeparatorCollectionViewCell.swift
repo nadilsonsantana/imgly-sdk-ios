@@ -8,24 +8,20 @@
 
 import UIKit
 
-class SeparatorCollectionViewCell: UICollectionViewCell {
+@objc(IMGLYSeparatorCollectionViewCell) public class SeparatorCollectionViewCell: UICollectionViewCell {
 
     // MARK: - Properties
 
-    lazy var separator: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+    public let separator = UIView()
 
     // MARK: - Initializers
 
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         commonInit()
     }
@@ -34,14 +30,15 @@ class SeparatorCollectionViewCell: UICollectionViewCell {
         isAccessibilityElement = false
         contentView.addSubview(separator)
 
+        separator.translatesAutoresizingMaskIntoConstraints = false
+
         var constraints = [NSLayoutConstraint]()
 
         constraints.append(NSLayoutConstraint(item: separator, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 1))
         constraints.append(NSLayoutConstraint(item: separator, attribute: .CenterX, relatedBy: .Equal, toItem: contentView, attribute: .CenterX, multiplier: 1, constant: 0))
-        constraints.append(NSLayoutConstraint(item: separator, attribute: .Top, relatedBy: .Equal, toItem: contentView, attribute: .Top, multiplier: 1, constant: 4))
-        constraints.append(NSLayoutConstraint(item: separator, attribute: .Bottom, relatedBy: .Equal, toItem: contentView, attribute: .Bottom, multiplier: 1, constant: -4))
+        constraints.append(NSLayoutConstraint(item: separator, attribute: .Top, relatedBy: .Equal, toItem: contentView, attribute: .Top, multiplier: 1, constant: 16))
+        constraints.append(NSLayoutConstraint(item: separator, attribute: .Bottom, relatedBy: .Equal, toItem: contentView, attribute: .Bottom, multiplier: 1, constant: -16))
 
         NSLayoutConstraint.activateConstraints(constraints)
     }
-
 }

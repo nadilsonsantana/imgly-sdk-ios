@@ -19,10 +19,10 @@ import GLKit
 
     // MARK: - Statics
 
-    static let ButtonCollectionViewCellReuseIdentifier = "ButtonCollectionViewCell"
+    static let IconCaptionCollectionViewCellReuseIdentifier = "IconCaptionCollectionViewCellReuseIdentifier"
     static let SeparatorCollectionViewCellReuseIdentifier = "SeparatorCollectionViewCellReuseIdentifier"
-    static let ButtonCollectionViewCellSize = CGSize(width: 64, height: 64)
-    static let SeparatorCollectionViewCellSize = CGSize(width: 13, height: 64)
+    static let ButtonCollectionViewCellSize = CGSize(width: 64, height: 80)
+    static let SeparatorCollectionViewCellSize = CGSize(width: 15, height: 80)
 
     // MARK: - View Properties
 
@@ -265,7 +265,7 @@ import GLKit
         if collectionView == nil {
             let flowLayout = UICollectionViewFlowLayout()
             flowLayout.scrollDirection = .Horizontal
-            flowLayout.sectionInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+            flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
             flowLayout.minimumInteritemSpacing = 8
             flowLayout.minimumLineSpacing = 8
 
@@ -275,7 +275,7 @@ import GLKit
             collectionView.dataSource = self
             collectionView.delegate = self
             collectionView.backgroundColor = UIColor.clearColor()
-            collectionView.registerClass(ButtonCollectionViewCell.self, forCellWithReuseIdentifier: PhotoEditViewController.ButtonCollectionViewCellReuseIdentifier)
+            collectionView.registerClass(IconCaptionCollectionViewCell.self, forCellWithReuseIdentifier: PhotoEditViewController.IconCaptionCollectionViewCellReuseIdentifier)
             collectionView.registerClass(SeparatorCollectionViewCell.self, forCellWithReuseIdentifier: PhotoEditViewController.SeparatorCollectionViewCellReuseIdentifier)
 
             self.collectionView = collectionView
@@ -423,7 +423,7 @@ import GLKit
 
         var constraints = [NSLayoutConstraint]()
 
-        var previewViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 110, right: 0)
+        var previewViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 124, right: 0)
         if let currentEditingTool = delegate?.photoEditViewControllerCurrentEditingTool(self) {
             previewViewInsets = previewViewInsets + currentEditingTool.preferredPreviewViewInsets
         }
@@ -611,12 +611,12 @@ extension PhotoEditViewController: UICollectionViewDataSource {
 
             return cell
         } else {
-            let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoEditViewController.ButtonCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
+            let cell = collectionView.dequeueReusableCellWithReuseIdentifier(PhotoEditViewController.IconCaptionCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
 
-            if let buttonCell = cell as? ButtonCollectionViewCell {
-                buttonCell.textLabel.text = action.title
-                buttonCell.imageView.image = action.image
-                buttonCell.accessibilityLabel = action.title
+            if let iconCaptionCell = cell as? IconCaptionCollectionViewCell {
+                iconCaptionCell.captionLabel.text = action.title
+                iconCaptionCell.imageView.image = action.image
+                iconCaptionCell.accessibilityLabel = action.title
             }
 
             return cell
@@ -673,15 +673,15 @@ extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDel
         let action = options.editorActionsDataSource.actionAtIndex(indexPath.item)
 
         if action.editorType == .Magic {
-            if let buttonCell = cell as? ButtonCollectionViewCell, let selectedImage = action.selectedImage {
+            if let iconCaptionCell = cell as? IconCaptionCollectionViewCell, let selectedImage = action.selectedImage {
                 if photoEditModel?.autoEnhancementEnabled ?? false {
-                    buttonCell.accessibilityTraits |= UIAccessibilityTraitSelected
-                    buttonCell.imageView.image = selectedImage
-                    buttonCell.imageView.tintAdjustmentMode = .Dimmed
+                    iconCaptionCell.accessibilityTraits |= UIAccessibilityTraitSelected
+                    iconCaptionCell.imageView.image = selectedImage
+                    iconCaptionCell.imageView.tintAdjustmentMode = .Dimmed
                 } else {
-                    buttonCell.accessibilityTraits &= ~UIAccessibilityTraitSelected
-                    buttonCell.imageView.image = action.image
-                    buttonCell.imageView.tintAdjustmentMode = .Normal
+                    iconCaptionCell.accessibilityTraits &= ~UIAccessibilityTraitSelected
+                    iconCaptionCell.imageView.image = action.image
+                    iconCaptionCell.imageView.tintAdjustmentMode = .Normal
                 }
             }
         }

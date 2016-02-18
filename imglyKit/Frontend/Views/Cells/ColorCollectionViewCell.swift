@@ -43,6 +43,7 @@ import UIKit
         contentView.addSubview(colorView)
         colorView.translatesAutoresizingMaskIntoConstraints = false
         colorView.layer.cornerRadius = 1
+        colorView.clipsToBounds = true
         constraints.append(NSLayoutConstraint(item: colorView, attribute: .Left, relatedBy: .Equal, toItem: contentView, attribute: .Left, multiplier: 1, constant: 0))
         constraints.append(NSLayoutConstraint(item: colorView, attribute: .Top, relatedBy: .Equal, toItem: contentView, attribute: .Top, multiplier: 1, constant: 8))
         constraints.append(NSLayoutConstraint(item: colorView, attribute: .Right, relatedBy: .Equal, toItem: contentView, attribute: .Right, multiplier: 1, constant: 0))
@@ -54,6 +55,16 @@ import UIKit
         constraints.append(NSLayoutConstraint(item: imageView, attribute: .CenterY, relatedBy: .Equal, toItem: contentView, attribute: .CenterY, multiplier: 1, constant: 0))
 
         NSLayoutConstraint.activateConstraints(constraints)
+    }
+
+    // MARK: - UICollectionViewCell
+
+    /*
+    :nodoc:
+    */
+    public override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
     }
 
     /*

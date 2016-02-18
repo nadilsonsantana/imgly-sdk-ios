@@ -47,6 +47,16 @@ import UIKit
         NSLayoutConstraint.activateConstraints(constraints)
     }
 
+    // MARK: - UICollectionViewCell
+
+    /*
+    :nodoc:
+    */
+    public override func prepareForReuse() {
+        super.prepareForReuse()
+        imageView.image = nil
+    }
+
     /*
     :nodoc:
     */

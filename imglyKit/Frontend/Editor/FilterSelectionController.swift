@@ -16,7 +16,7 @@ public typealias FilterTypeActiveBlock = () -> (FilterType?)
     // MARK: - Statics
 
     private static let FilterCollectionViewCellReuseIdentifier = "FilterCollectionViewCell"
-    private static let FilterCollectionViewCellSize = CGSize(width: 64, height: 64)
+    private static let FilterCollectionViewCellSize = CGSize(width: 64, height: 80)
     private static let FilterActivationDuration = NSTimeInterval(0.15)
 
     private static var filterPreviews = [FilterType : UIImage]()
@@ -65,13 +65,10 @@ extension FilterSelectionController: UICollectionViewDataSource {
             let filter = InstanceFactory.effectFilterWithType(filterType)
 
             filterCell.accessibilityLabel = dataSource.titleForFilterAtIndex(indexPath.item)
-            filterCell.textLabel.text = dataSource.titleForFilterAtIndex(indexPath.item)
-            filterCell.imageView.layer.cornerRadius = 3
-            filterCell.imageView.clipsToBounds = true
-            filterCell.imageView.contentMode = .ScaleToFill
+            filterCell.captionLabel.text = dataSource.titleForFilterAtIndex(indexPath.item)
             filterCell.imageView.image = nil
-            filterCell.tickImageView.image = self.dataSource.selectedImageForFilterAtIndex(indexPath.item)
-            filterCell.hideTick()
+//            filterCell.tickImageView.image = self.dataSource.selectedImageForFilterAtIndex(indexPath.item)
+//            filterCell.hideTick()
 
             if let filterPreviewImage = FilterSelectionController.filterPreviews[filterType] {
                 self.updateCell(filterCell, atIndexPath: indexPath, withFilterType: filterType, forImage: filterPreviewImage)
@@ -103,7 +100,7 @@ extension FilterSelectionController: UICollectionViewDataSource {
         cell.imageView.image = image
 
         if let activeFilterType = activeFilterType?() where activeFilterType == filterType {
-            cell.showTick()
+//            cell.showTick()
             selectedCellIndex = indexPath.item
         }
     }
@@ -126,7 +123,7 @@ extension FilterSelectionController: UICollectionViewDelegate {
         // get cell of previously selected filter if visible
         if let selectedCellIndex = self.selectedCellIndex, let cell = collectionView.cellForItemAtIndexPath(NSIndexPath(forItem: selectedCellIndex, inSection: 0)) as? FilterCollectionViewCell {
             UIView.animateWithDuration(FilterSelectionController.FilterActivationDuration, animations: { () -> Void in
-                cell.hideTick()
+//                cell.hideTick()
             })
         }
 
@@ -137,7 +134,7 @@ extension FilterSelectionController: UICollectionViewDelegate {
             selectedCellIndex = indexPath.item
 
             UIView.animateWithDuration(FilterSelectionController.FilterActivationDuration, animations: { () -> Void in
-                cell.showTick()
+//                cell.showTick()
             })
         }
     }

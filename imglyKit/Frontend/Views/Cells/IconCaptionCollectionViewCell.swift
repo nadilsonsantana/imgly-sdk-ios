@@ -74,6 +74,17 @@ import UIKit
         NSLayoutConstraint.activateConstraints(constraints)
     }
 
+    // MARK: - UICollectionViewCell
+
+    /*
+    :nodoc:
+    */
+    public override func prepareForReuse() {
+        super.prepareForReuse()
+        captionLabel.text = nil
+        imageView.image = nil
+    }
+
     /*
      :nodoc:
      */

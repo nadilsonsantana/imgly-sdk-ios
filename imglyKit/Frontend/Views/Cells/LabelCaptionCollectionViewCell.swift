@@ -11,7 +11,7 @@ import UIKit
 @objc(IMGLYLabelCaptionCollectionViewCell) public class LabelCaptionCollectionViewCell: UICollectionViewCell {
 
     // MARK: - Properties
-    
+
     public let label = UILabel()
     public let captionLabel = UILabel()
     public let selectionIndicator = UIView()

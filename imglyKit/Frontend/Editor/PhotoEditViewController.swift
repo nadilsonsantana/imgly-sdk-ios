@@ -101,6 +101,15 @@ import GLKit
     private var lastKnownWorkImageSize = CGSize.zero
     private var lastKnownPreviewViewSize = CGSize.zero
 
+    /// The identifier of the photo effect to apply to the photo immediately. This is useful if you
+    /// pass a photo that already has an effect applied by the `CameraViewController`. Note that you
+    /// must set this property before presenting the view controller.
+    public var initialPhotoEffectIdentifier: String?
+
+    /// The intensity of the photo effect that is applied to the photo immediately. See
+    /// `initialPhotoEffectIdentifier` for more information.
+    public var initialPhotoEffectIntensity: Float?
+
     // MARK: - Other Properties
 
     weak var delegate: PhotoEditViewControllerDelegate?
@@ -255,6 +264,15 @@ import GLKit
     private func loadPhotoEditModelIfNecessary() {
         if photoEditModel == nil {
             let editModel = IMGLYPhotoEditMutableModel()
+
+            if let photoEffectIdentifier = initialPhotoEffectIdentifier where editModel.effectFilterIdentifier != photoEffectIdentifier {
+                editModel.effectFilterIdentifier = photoEffectIdentifier
+            }
+
+            if let photoEffectIntensity = initialPhotoEffectIntensity where editModel.effectFilterIntensity != CGFloat(photoEffectIntensity) {
+                editModel.effectFilterIntensity = CGFloat(photoEffectIntensity)
+            }
+
             loadBaseImageIfNecessary()
             photoEditModel = editModel
             uneditedPhotoEditModel = editModel
@@ -688,6 +706,10 @@ extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDel
 }
 
 extension PhotoEditViewController: PhotoEditToolControllerDelegate {
+    public func photoEditToolControllerBaseImage(photoEditToolController: PhotoEditToolController) -> UIImage? {
+        return baseWorkUIImage
+    }
+
     public func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController) {
         delegate?.photoEditViewControllerPopToolController(self)
     }

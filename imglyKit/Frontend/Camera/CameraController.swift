@@ -275,13 +275,24 @@ private var cameraControllerContext = 0
     }
 
     /// The effect filter that is applied to the live feed.
-    public var effectFilter: EffectFilter {
+    public var photoEffect: PhotoEffect? {
         get {
-            return sampleBufferController.effectFilter
+            return sampleBufferController.photoEffect
         }
 
         set {
-            sampleBufferController.effectFilter = newValue
+            sampleBufferController.photoEffect = newValue
+        }
+    }
+
+    /// The intensity of the filter that is applied to the live feed.
+    public var photoEffectIntensity: Float {
+        get {
+            return sampleBufferController.photoEffectIntensity
+        }
+
+        set {
+            sampleBufferController.photoEffectIntensity = newValue
         }
     }
 

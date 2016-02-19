@@ -20,7 +20,7 @@ static NSData *identityLUT;
 
 @interface LUTToNSDataConverter ()
 
-@property(nonatomic, nonnull, copy) NSString *identityName;
+@property(nonatomic, nonnull, strong) NSURL *identityLUTURL;
 @property(nonatomic, nonnull, copy) NSData *identityLUT;
 @property(nonatomic, nullable, copy) NSData *lut;
 
@@ -28,23 +28,23 @@ static NSData *identityLUT;
 
 @implementation LUTToNSDataConverter
 
-@synthesize identityLUT = _identityLUT;
+@synthesize identityLUTURL = _identityLUTURL;
 
 #pragma mark - Accessors
 
 - (NSData *)identityLUT {
     if (!_identityLUT) {
-        _identityLUT = [[LUTToNSDataConverter colorCubeDataFromLUT:self.identityName] copy];
+        _identityLUT = [[LUTToNSDataConverter colorCubeDataFromLUTAtURL:self.identityLUTURL] copy];
         NSAssert(_identityLUT != nil, @"Unable to create identity LUT from given name.");
     }
 
     return _identityLUT;
 }
 
-- (void)setLutName:(NSString *)lutName {
-    if (![_lutName isEqual:lutName]) {
-        _lutName = [lutName copy];
-        _lut = [[LUTToNSDataConverter colorCubeDataFromLUT:lutName] copy];
+- (void)setLutURL:(NSURL *)lutURL {
+    if (![_lutURL isEqual:lutURL]) {
+        _lutURL = lutURL;
+        _lut = [[LUTToNSDataConverter colorCubeDataFromLUTAtURL:lutURL] copy];
         NSAssert(_lut != nil, @"Unable to create lut from given name.");
     }
 }
@@ -73,9 +73,9 @@ static NSData *identityLUT;
 
 #pragma mark - Initializers
 
-- (instancetype)initWithIdentityName:(nonnull NSString *)identityName {
+- (instancetype)initWithIdentityLUTAtURL:(nonnull NSURL *)identityLUTURL {
     if ((self = [super init])) {
-        _identityName = identityName;
+        _identityLUTURL = identityLUTURL;
         _intensity = 1;
     }
 
@@ -89,48 +89,46 @@ static NSData *identityLUT;
  The resulting data can be used to feed an CIColorCube filter, so that the transformation
  realised by the LUT is applied with a core image standard filter
  */
-+ (nullable NSData *)colorCubeDataFromLUT:(nonnull NSString *)name {
-    #if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
-    UIImage *image = [UIImage imageNamed:name inBundle:[NSBundle bundleForClass:self.class] compatibleWithTraitCollection:nil];
-    #elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
-    NSBundle *bundle = [NSBundle bundleForClass:self.class];
-    NSImage *image = [bundle imageForResource:name];
-    image.name = name;
-    #endif
-    
++ (nullable NSData *)colorCubeDataFromLUTAtURL:(nonnull NSURL *)lutURL {
+#if defined(__IPHONE_OS_VERSION_MIN_REQUIRED)
+    UIImage *image = [[UIImage alloc] initWithContentsOfFile:lutURL.path];
+#elif defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
+    NSImage *image = [[NSImage alloc] initWithContentOfURL:lutURL];
+#endif
+
     if (!image) {
         return nil;
     }
-    
+
     NSInteger width = CGImageGetWidth(image.CGImage);
     NSInteger height = CGImageGetHeight(image.CGImage);
     NSInteger rowNum = height / kDimension;
     NSInteger columnNum = width / kDimension;
-    
+
     if ((width % kDimension != 0) || (height % kDimension != 0) || (rowNum * columnNum != kDimension)) {
-        NSLog(@"Invalid colorLUT %@",name);
+        NSLog(@"Invalid colorLUT %@", lutURL);
         return nil;
     }
-    
+
     float *bitmap = [self createRGBABitmapFromImage:image.CGImage];
-    
+
     if (bitmap == NULL) {
         return nil;
     }
-    
+
     NSInteger size = kDimension * kDimension * kDimension * sizeof(float) * 4;
     float *data = malloc(size);
     int bitmapOffset = 0;
     int z = 0;
-    for (int row = 0; row <  rowNum; row++) {
+    for (int row = 0; row < rowNum; row++) {
         for (int y = 0; y < kDimension; y++) {
             int tmp = z;
             for (int col = 0; col < columnNum; col++) {
                 NSInteger dataOffset = (z * kDimension * kDimension + y * kDimension) * 4;
-                
+
                 const float divider = 255.0;
                 vDSP_vsdiv(&bitmap[bitmapOffset], 1, &divider, &data[dataOffset], 1, kDimension * 4);
-                
+
                 bitmapOffset += kDimension * 4;
                 z++;
             }
@@ -138,9 +136,9 @@ static NSData *identityLUT;
         }
         z += columnNum;
     }
-    
+
     free(bitmap);
-    
+
     return [NSData dataWithBytesNoCopy:data length:size freeWhenDone:YES];
 }
 
@@ -150,45 +148,40 @@ static NSData *identityLUT;
     unsigned char *bitmap;
     NSInteger bitmapSize;
     NSInteger bytesPerRow;
-    
+
     size_t width = CGImageGetWidth(image);
     size_t height = CGImageGetHeight(image);
-    
-    bytesPerRow   = (width * 4);
-    bitmapSize     = (bytesPerRow * height);
-    
-    bitmap = malloc( bitmapSize );
+
+    bytesPerRow = (width * 4);
+    bitmapSize = (bytesPerRow * height);
+
+    bitmap = malloc(bitmapSize);
     if (bitmap == NULL) {
         return NULL;
     }
-    
+
     colorSpace = CGColorSpaceCreateDeviceRGB();
     if (colorSpace == NULL) {
         free(bitmap);
         return NULL;
     }
-    
-    context = CGBitmapContextCreate (bitmap,
-                                     width,
-                                     height,
-                                     8,
-                                     bytesPerRow,
-                                     colorSpace,
-                                     (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
-    CGColorSpaceRelease( colorSpace );
-    
+
+    context = CGBitmapContextCreate(bitmap, width, height, 8, bytesPerRow, colorSpace,
+                                    (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
+    CGColorSpaceRelease(colorSpace);
+
     if (context == NULL) {
-        free (bitmap);
+        free(bitmap);
         return NULL;
     }
-    
+
     CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
     CGContextRelease(context);
-    
+
     float *convertedBitmap = malloc(bitmapSize * sizeof(float));
     vDSP_vfltu8(bitmap, 1, convertedBitmap, 1, bitmapSize);
     free(bitmap);
-    
+
     return convertedBitmap;
 }
 

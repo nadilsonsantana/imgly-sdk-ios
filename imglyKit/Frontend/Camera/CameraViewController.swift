@@ -807,15 +807,14 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
     }
 
     private func configureFilterSelectionController() {
-        filterSelectionController.dataSource = self.options.filtersDataSource
-        filterSelectionController.selectedBlock = { [weak self] filterType, initialFilterIntensity in
-            if let cameraController = self?.cameraController where cameraController.effectFilter.filterType != filterType {
-                cameraController.effectFilter = InstanceFactory.effectFilterWithType(filterType)
-                cameraController.effectFilter.inputIntensity = initialFilterIntensity
-                self?.filterIntensitySlider.value = initialFilterIntensity
+        filterSelectionController.selectedBlock = { [weak self] photoEffect in
+            if let cameraController = self?.cameraController where cameraController.photoEffect != photoEffect {
+                cameraController.photoEffect = photoEffect
+                cameraController.photoEffectIntensity = self?.options.initialFilterIntensity ?? 1
+                self?.filterIntensitySlider.value = self?.options.initialFilterIntensity ?? 1
             }
 
-            if filterType == .None {
+            if photoEffect.identifier == "None" {
                 self?.hideSliderTimer?.invalidate()
                 if let filterIntensitySlider = self?.filterIntensitySlider where filterIntensitySlider.alpha > 0 {
                     UIView.animateWithDuration(0.25) {
@@ -833,11 +832,11 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
             }
         }
 
-        filterSelectionController.activeFilterType = { [weak self] in
+        filterSelectionController.activePhotoEffectBlock = { [weak self] in
             if let cameraController = self?.cameraController {
-                return cameraController.effectFilter.filterType
+                return cameraController.photoEffect
             } else {
-                return .None
+                return nil
             }
         }
     }
@@ -909,11 +908,14 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
         // swiftlint:disable force_cast
         let photoEditViewController = (self.configuration.getClassForReplacedClass(PhotoEditViewController.self) as! PhotoEditViewController.Type).init(photo: image, configuration: configuration)
         // swiftlint:enable force_cast
-//        if let cameraController = cameraController {
-//            editorViewController.initialFilterType = cameraController.effectFilter.filterType
-//            editorViewController.initialFilterIntensity = cameraController.effectFilter.inputIntensity
-//        }
-//        editorViewController.completionBlock = editorCompletionBlock
+
+        if let photoEffectIdentifier = cameraController?.photoEffect?.identifier {
+            photoEditViewController.initialPhotoEffectIdentifier = photoEffectIdentifier
+        }
+
+        if let photoEffectIntensity = cameraController?.photoEffectIntensity {
+            photoEditViewController.initialPhotoEffectIntensity = photoEffectIntensity
+        }
 
         let toolStackController = ToolStackController(photoEditViewController: photoEditViewController)
         self.presentViewController(toolStackController, animated: true, completion: nil)
@@ -1284,7 +1286,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
     @objc private func changeIntensity(sender: UISlider?) {
         if let slider = sender {
             resetHideSliderTimer()
-            cameraController?.effectFilter.inputIntensity = slider.value
+            cameraController?.photoEffectIntensity = slider.value
         }
     }
 

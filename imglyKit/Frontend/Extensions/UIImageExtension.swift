@@ -149,7 +149,7 @@ public extension UIImage {
             let sourceScale = size.width / size.height
             let targetScale = rect.width / rect.height
 
-            if targetScale > sourceScale {
+            if sourceScale > targetScale {
                 let fittedWidth = size.width * rect.width / size.height
                 let x = rect.midX + fittedWidth * -0.5
 

@@ -62,11 +62,11 @@ public typealias RecordingModeButtonConfigurationClosure = (UIButton, RecordingM
     /// Enable/Disable filter bottom drawer. Enabled by default.
     public let showFilters: Bool
 
-    /// An object conforming to the `FiltersDataSourceProtocol`
-    public let filtersDataSource: FiltersDataSourceProtocol
-
     /// Enable/Disable filter intensity slider.
     public let showFilterIntensitySlider: Bool
+
+    /// The initial intensity of the filters.
+    public let initialFilterIntensity: Float
 
     /// Allowed camera positions. Defaults to all available positions
     /// and falls back to supported position if only one exists.
@@ -120,8 +120,8 @@ public typealias RecordingModeButtonConfigurationClosure = (UIButton, RecordingM
         tapToFocusEnabled = builder.tapToFocusEnabled
         showCameraRoll = builder.showCameraRoll
         showFilters = builder.showFilters
-        filtersDataSource = builder.filtersDataSource
         showFilterIntensitySlider = builder.showFilterIntensitySlider
+        initialFilterIntensity = builder.initialFilterIntensity
         allowedCameraPositions = builder.allowedCameraPositions
         allowedFlashModes = builder.allowedFlashModes
         allowedTorchModes = builder.allowedTorchModes
@@ -179,11 +179,11 @@ public typealias RecordingModeButtonConfigurationClosure = (UIButton, RecordingM
     /// Enable/Disable filter bottom drawer. Enabled by default.
     public var showFilters = true
 
-    /// An object conforming to the `FiltersDataSourceProtocol`
-    public var filtersDataSource: FiltersDataSourceProtocol = FiltersDataSource()
-
     /// Enable/Disable filter intensity slider.
     public var showFilterIntensitySlider = true
+
+    /// The initial intensity of the filters.
+    public var initialFilterIntensity = Float(0.75)
 
     /// Allowed camera positions. Defaults to all available positions
     /// and falls back to supported position if only one exists. To set

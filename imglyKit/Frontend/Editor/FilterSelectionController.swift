@@ -8,8 +8,8 @@
 
 import UIKit
 
-public typealias FilterTypeSelectedBlock = (FilterType, Float) -> (Void)
-public typealias FilterTypeActiveBlock = () -> (FilterType?)
+public typealias PhotoEffectSelectedBlock = (PhotoEffect) -> (Void)
+public typealias PhotoEffectActiveBlock = () -> (PhotoEffect?)
 
 @objc(IMGLYFilterSelectionController) public class FilterSelectionController: NSObject {
 
@@ -19,19 +19,23 @@ public typealias FilterTypeActiveBlock = () -> (FilterType?)
     private static let FilterCollectionViewCellSize = CGSize(width: 64, height: 80)
     private static let FilterActivationDuration = NSTimeInterval(0.15)
 
-    private static var filterPreviews = [FilterType : UIImage]()
+    private var thumbnails = [Int: UIImage]()
 
     // MARK: - Properties
 
     public let collectionView: UICollectionView
-    public var dataSource: FiltersDataSourceProtocol = FiltersDataSource()
-    private var selectedCellIndex: Int?
-    public var selectedBlock: FilterTypeSelectedBlock?
-    public var activeFilterType: FilterTypeActiveBlock?
+    public var selectedBlock: PhotoEffectSelectedBlock?
+    public var activePhotoEffectBlock: PhotoEffectActiveBlock?
+
+    private var photoEffectThumbnailRenderer: PhotoEffectThumbnailRenderer?
 
     // MARK: - Initializers
 
-    public override init() {
+    public convenience override init() {
+        self.init(inputImage: nil)
+    }
+
+    public init(inputImage: UIImage?) {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.itemSize = FilterSelectionController.FilterCollectionViewCellSize
         flowLayout.scrollDirection = .Horizontal
@@ -48,61 +52,56 @@ public typealias FilterTypeActiveBlock = () -> (FilterType?)
         collectionView.backgroundColor = UIColor.clearColor()
         collectionView.delegate = self
         collectionView.dataSource = self
+
+        let renderer = PhotoEffectThumbnailRenderer(inputImage: inputImage ?? UIImage(named: "nonePreview", inBundle: NSBundle(forClass: FilterSelectionController.self), compatibleWithTraitCollection: nil)!)
+        renderer.generateThumbnailsForPhotoEffects(PhotoEffect.allEffects, ofSize: CGSize(width: 64, height: 64)) { thumbnail, index in
+            dispatch_async(dispatch_get_main_queue()) {
+                self.saveThumbnail(thumbnail, forIndex: index)
+            }
+        }
+    }
+
+    private func saveThumbnail(thumbnail: UIImage, forIndex index: Int) {
+        thumbnails[index] = thumbnail
+
+        if let cell = collectionView.cellForItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0)) as? FilterCollectionViewCell where collectionView.superview != nil {
+            cell.imageView.image = thumbnail
+            cell.activityIndicator.stopAnimating()
+        }
     }
 
 }
 
 extension FilterSelectionController: UICollectionViewDataSource {
     public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.filterCount
+        return PhotoEffect.allEffects.count
     }
 
     public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(FilterSelectionController.FilterCollectionViewCellReuseIdentifier, forIndexPath: indexPath)
 
         if let filterCell = cell as? FilterCollectionViewCell {
-            let filterType = dataSource.filterTypeAtIndex(indexPath.item)
-            let filter = InstanceFactory.effectFilterWithType(filterType)
+            let effectFilter = PhotoEffect.allEffects[indexPath.item]
 
-            filterCell.accessibilityLabel = dataSource.titleForFilterAtIndex(indexPath.item)
-            filterCell.captionLabel.text = dataSource.titleForFilterAtIndex(indexPath.item)
-            filterCell.imageView.image = nil
-//            filterCell.tickImageView.image = self.dataSource.selectedImageForFilterAtIndex(indexPath.item)
-//            filterCell.hideTick()
+            if effectFilter == activePhotoEffectBlock?() {
+                dispatch_async(dispatch_get_main_queue()) {
+                    // Unfortunately this does not work the first time it is called, so we are doing it in the next
+                    // layout pass
+                    collectionView.selectItemAtIndexPath(indexPath, animated: false, scrollPosition: .None)
+                }
+            }
 
-            if let filterPreviewImage = FilterSelectionController.filterPreviews[filterType] {
-                self.updateCell(filterCell, atIndexPath: indexPath, withFilterType: filterType, forImage: filterPreviewImage)
-                filterCell.activityIndicator.stopAnimating()
+            filterCell.accessibilityLabel = effectFilter.displayName
+            filterCell.captionLabel.text = effectFilter.displayName
+
+            if let image = thumbnails[indexPath.item] {
+                filterCell.imageView.image = image
             } else {
                 filterCell.activityIndicator.startAnimating()
-
-                // Create filterPreviewImage
-                dispatch_async(kPhotoProcessorQueue) {
-                    let filterPreviewImage = PhotoProcessor.processWithUIImage(self.dataSource.previewImageForFilterAtIndex(indexPath.item), filters: [filter])
-
-                    dispatch_async(dispatch_get_main_queue()) {
-                        FilterSelectionController.filterPreviews[filterType] = filterPreviewImage
-                        if let filterCell = collectionView.cellForItemAtIndexPath(indexPath) as? FilterCollectionViewCell {
-                            self.updateCell(filterCell, atIndexPath: indexPath, withFilterType: filter.filterType, forImage: filterPreviewImage)
-                            filterCell.activityIndicator.stopAnimating()
-                        }
-                    }
-                }
             }
         }
 
         return cell
-    }
-
-    // MARK: - Helpers
-
-    private func updateCell(cell: FilterCollectionViewCell, atIndexPath indexPath: NSIndexPath, withFilterType filterType: FilterType, forImage image: UIImage?) {
-        cell.imageView.image = image
-
-        if let activeFilterType = activeFilterType?() where activeFilterType == filterType {
-//            cell.showTick()
-            selectedCellIndex = indexPath.item
-        }
     }
 }
 
@@ -113,29 +112,7 @@ extension FilterSelectionController: UICollectionViewDelegate {
             collectionView.scrollRectToVisible(extendedCellRect, animated: true)
         }
 
-        let filterType = self.dataSource.filterTypeAtIndex(indexPath.item)
-
-        if selectedCellIndex == indexPath.item {
-            selectedBlock?(filterType, self.dataSource.initialIntensityForFilterAtIndex(indexPath.item))
-            return
-        }
-
-        // get cell of previously selected filter if visible
-        if let selectedCellIndex = self.selectedCellIndex, let cell = collectionView.cellForItemAtIndexPath(NSIndexPath(forItem: selectedCellIndex, inSection: 0)) as? FilterCollectionViewCell {
-            UIView.animateWithDuration(FilterSelectionController.FilterActivationDuration, animations: { () -> Void in
-//                cell.hideTick()
-            })
-        }
-
-        selectedBlock?(filterType, self.dataSource.initialIntensityForFilterAtIndex(indexPath.item))
-
-        // get cell of newly selected filter
-        if let cell = collectionView.cellForItemAtIndexPath(indexPath) as? FilterCollectionViewCell {
-            selectedCellIndex = indexPath.item
-
-            UIView.animateWithDuration(FilterSelectionController.FilterActivationDuration, animations: { () -> Void in
-//                cell.showTick()
-            })
-        }
+        let photoEffect = PhotoEffect.allEffects[indexPath.item]
+        selectedBlock?(photoEffect)
     }
 }

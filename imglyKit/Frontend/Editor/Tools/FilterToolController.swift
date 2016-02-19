@@ -12,7 +12,7 @@ import UIKit
 
     // MARK: - Properties
 
-    private lazy var filterSelectionController = FilterSelectionController()
+    private var filterSelectionController: FilterSelectionController?
 
     private var sliderContainerView: UIView?
     private var slider: UISlider?
@@ -27,23 +27,58 @@ import UIKit
     public override func viewDidLoad() {
         super.viewDidLoad()
 
+        filterSelectionController = FilterSelectionController(inputImage: delegate?.photoEditToolControllerBaseImage(self))
+        filterSelectionController?.activePhotoEffectBlock = { [weak self] in
+            guard let strongSelf = self else {
+                return nil
+            }
+
+            return PhotoEffect.effectWithIdentifier(strongSelf.photoEditModel.effectFilterIdentifier) ?? PhotoEffect.effectWithIdentifier("None")
+        }
+
+        filterSelectionController?.selectedBlock = { [weak self] photoEffect in
+            guard let strongSelf = self else {
+                return
+            }
+
+            if photoEffect.identifier == "None" {
+                UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
+                    strongSelf.sliderContainerView?.alpha = 0
+                    }, completion: nil)
+            } else {
+                UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
+                    strongSelf.sliderContainerView?.alpha = 1
+                    }, completion: nil)
+            }
+
+            strongSelf.photoEditModel.performChangesWithBlock {
+                strongSelf.photoEditModel.effectFilterIntensity = 0.75 // TODO: Options
+                strongSelf.photoEditModel.effectFilterIdentifier = photoEffect.identifier
+            }
+
+            strongSelf.slider?.value = 0.75 // TODO: Options
+        }
+
         toolStackItem.performChanges {
-            toolStackItem.mainToolbarView = filterSelectionController.collectionView
+            toolStackItem.mainToolbarView = filterSelectionController?.collectionView
             toolStackItem.titleLabel?.text = Localize("FILTER")
             toolStackItem.applyButton?.addTarget(self, action: "apply:", forControlEvents: .TouchUpInside)
             toolStackItem.discardButton?.addTarget(self, action: "discard:", forControlEvents: .TouchUpInside)
         }
 
+        let photoEffect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier)
+
         let sliderContainerView = UIView()
         sliderContainerView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.8)
         sliderContainerView.translatesAutoresizingMaskIntoConstraints = false
-//        sliderContainerView.alpha = activeAdjustTool == nil ? 0 : 1
+        sliderContainerView.alpha = photoEffect?.identifier == "None" ? 0 : 1
         view.addSubview(sliderContainerView)
         self.sliderContainerView = sliderContainerView
 
         let slider = UISlider()
         slider.translatesAutoresizingMaskIntoConstraints = false
         slider.minimumValue = 0
+        slider.value = Float(photoEditModel.effectFilterIntensity)
         slider.maximumValue = 1
         slider.continuous = true
         slider.setThumbImage(UIImage(named: "slider_knob", inBundle: NSBundle(forClass: AdjustToolController.self), compatibleWithTraitCollection: nil), forState: .Normal)
@@ -52,6 +87,17 @@ import UIKit
         self.slider = slider
 
         view.setNeedsUpdateConstraints()
+    }
+
+    /*
+    :nodoc:
+    */
+    public override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if let photoEffect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier), index = PhotoEffect.allEffects.indexOf(photoEffect) {
+            filterSelectionController?.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0), atScrollPosition: .CenteredHorizontally, animated: animated)
+        }
     }
 
     public override func updateViewConstraints() {
@@ -75,6 +121,12 @@ import UIKit
     }
 
     // MARK: - Actions
+
+    @objc private func changeValue(sender: UISlider) {
+        photoEditModel.performChangesWithBlock {
+            self.photoEditModel.effectFilterIntensity = CGFloat(sender.value)
+        }
+    }
 
     @objc private func apply(sender: UIButton) {
         delegate?.photoEditToolControllerDidFinish(self)

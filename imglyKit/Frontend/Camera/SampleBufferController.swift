@@ -16,7 +16,9 @@ class SampleBufferController: NSObject {
 
     let videoPreviewView: GLKView
     let ciContext: CIContext
-    var effectFilter: EffectFilter = NoneFilter()
+    var photoEffect: PhotoEffect? = PhotoEffect.allEffects.first
+    var photoEffectIntensity: Float = 1
+
     var videoController: VideoController?
     var previewFrameChangedHandler: ((previewFrame: CGRect) -> Void)?
 
@@ -27,7 +29,11 @@ class SampleBufferController: NSObject {
             }
         }
     }
+
     private(set) var currentVideoDimensions: CMVideoDimensions?
+
+    private var colorCubeData: NSData?
+    private lazy var lutConverter = LUTToNSDataConverter(identityLUTAtURL: NSBundle(forClass: SampleBufferController.self).URLForResource("Identity", withExtension: "png")!)
 
     // MARK: - Initializers
 
@@ -76,10 +82,27 @@ extension SampleBufferController: AVCaptureVideoDataOutputSampleBufferDelegate, 
         }
 
         let filteredImage: CIImage
-        if effectFilter is NoneFilter {
-            filteredImage = sourceImage
+        if let effect = photoEffect, filter = effect.newEffectFilter {
+
+            // If this is a `CIColorCube` or `CIColorCubeWithColorSpace` filter, a `lutURL` is set
+            // and no `inputCubeData` was specified, generate new color cube data from the provided
+            // LUT
+            if let lutURL = effect.lutURL, filterName = effect.CIFilterName where (filterName == "CIColorCube" || filterName == "CIColorCubeWithColorSpace") && effect.options?["inputCubeData"] == nil {
+                // Update color cube data if needed
+                if lutConverter.lutURL != lutURL || lutConverter.intensity != photoEffectIntensity {
+                    lutConverter.lutURL = effect.lutURL
+                    lutConverter.intensity = photoEffectIntensity
+                    colorCubeData = lutConverter.colorCubeData
+                }
+
+                filter.setValue(colorCubeData, forKey: "inputCubeData")
+            }
+
+            filter.setValue(sourceImage, forKey: kCIInputImageKey)
+            filteredImage = filter.outputImage ?? sourceImage
         } else {
-            filteredImage = PhotoProcessor.processWithCIImage(sourceImage, filters: [effectFilter]) ?? sourceImage
+            colorCubeData = nil
+            filteredImage = sourceImage
         }
 
         let targetRect = CGRect(x: 0, y: 0, width: videoPreviewView.drawableWidth, height: videoPreviewView.drawableHeight)

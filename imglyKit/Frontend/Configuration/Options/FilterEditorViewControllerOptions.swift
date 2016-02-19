@@ -20,11 +20,6 @@ public typealias FilterSelectedClosure = (String) -> ()
     /// Defaults to an empty implementation.
     public let filterIntensitySliderConfigurationClosure: SliderConfigurationClosure?
 
-    /// An object conforming to the `FiltersDataSourceProtocol`
-    /// Per default an `FilterSelectionControllerDataSource` offering all filters
-    /// is set.
-    public let filterDataSource: FiltersDataSourceProtocol
-
     /// Enable/Disable the filter intensity slider. Defaults to true.
     public let showFilterIntensitySlider: Bool
 
@@ -49,7 +44,6 @@ public typealias FilterSelectedClosure = (String) -> ()
      */
     public init(builder: FilterEditorViewControllerOptionsBuilder) {
         filterIntensitySliderConfigurationClosure = builder.filterIntensitySliderConfigurationClosure
-        filterDataSource = builder.filterDataSource
         showFilterIntensitySlider = builder.showFilterIntensitySlider
         filterSelectedClosure = builder.filterSelectedClosure
         super.init(editorBuilder: builder)
@@ -69,11 +63,6 @@ public typealias FilterSelectedClosure = (String) -> ()
 
     /// This closure is called every time the user selects a filter.
     public var filterSelectedClosure: FilterSelectedClosure? = nil
-
-    /// An object conforming to the `FiltersDataSourceProtocol`
-    /// Per default an `FilterSelectionControllerDataSource` offering all filters
-    /// is set.
-    public var filterDataSource: FiltersDataSourceProtocol = FiltersDataSource()
 
     /// Enable/Disable the filter intensity slider. Defaults to true.
     public var showFilterIntensitySlider = true

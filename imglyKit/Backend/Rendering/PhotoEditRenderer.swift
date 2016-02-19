@@ -42,9 +42,11 @@ import CoreImage
         }
     }
 
-    private var effectFilter: EffectFilter?
+    private var colorCubeData: NSData?
+    private var effectFilter: CIFilter?
 
     private lazy var renderingQueue = dispatch_queue_create("photo_edit_rendering", DISPATCH_QUEUE_SERIAL)
+    private lazy var lutConverter = LUTToNSDataConverter(identityLUTAtURL: NSBundle(forClass: PhotoEditRenderer.self).URLForResource("Identity", withExtension: "png")!)
 
     private var cachedOutputImage: CIImage?
     @NSCopying private var photoEditModelInCachedOutputImage: IMGLYPhotoEditModel?
@@ -107,8 +109,32 @@ import CoreImage
         // TiltShift
         // TODO
 
-        // EffectFilter
-        // TODO
+        // PhotoEffect
+        if let effect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier),
+            filter = effect.newEffectFilter {
+
+            // If this is a `CIColorCube` or `CIColorCubeWithColorSpace` filter, a `lutURL` is set
+            // and no `inputCubeData` was specified, generate new color cube data from the provided
+            // LUT
+            if let lutURL = effect.lutURL, filterName = effect.CIFilterName where (filterName == "CIColorCube" || filterName == "CIColorCubeWithColorSpace") && effect.options?["inputCubeData"] == nil {
+                // Update color cube data if needed
+                if lutConverter.lutURL != lutURL || lutConverter.intensity != Float(photoEditModel.effectFilterIntensity) {
+                    lutConverter.lutURL = effect.lutURL
+                    lutConverter.intensity = Float(photoEditModel.effectFilterIntensity)
+                    colorCubeData = lutConverter.colorCubeData
+                }
+
+                filter.setValue(colorCubeData, forKey: "inputCubeData")
+            } else {
+                colorCubeData = nil
+            }
+
+            filter.setValue(editedImage, forKey: kCIInputImageKey)
+
+            if let outputImage = filter.outputImage {
+                editedImage = outputImage
+            }
+        }
 
         // Color Adjustments
         if renderMode.contains(.ColorAdjustments) {

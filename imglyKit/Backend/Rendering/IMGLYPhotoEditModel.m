@@ -20,7 +20,7 @@
         _autoEnhancementEnabled = false;
         _brightness = 0;
         _contrast = 1;
-        _effectFilterIdentifier = @"TODO";
+        _effectFilterIdentifier = @"None";
         _effectFilterIntensity = 0.75;
         _normalizedCropRect = [[self class] identityNormalizedCropRect];
         _saturation = 1;

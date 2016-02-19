@@ -22,8 +22,6 @@ extension InstanceFactory {
     */
     public class func viewControllerForEditorActionType(actionType: MainEditorActionType, withFixedFilterStack fixedFilterStack: FixedFilterStack, configuration: Configuration) -> SubEditorViewController? {
         switch actionType {
-        case .Filter:
-            return filterEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Stickers:
             return stickersEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Orientation:
@@ -32,12 +30,6 @@ extension InstanceFactory {
             return focusEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Crop:
             return cropEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
-        case .Brightness:
-            return brightnessEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
-        case .Contrast:
-            return contrastEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
-        case .Saturation:
-            return saturationEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Text:
             return textEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Border:
@@ -79,15 +71,6 @@ extension InstanceFactory {
         }
     }
 
-    public class func filterEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> FilterEditorViewController {
-        // swiftlint:disable force_cast
-        let vc = configuration.getClassForReplacedClass(FilterEditorViewController.self).init() as! FilterEditorViewController
-        // swiftlint:enable force_cast
-        vc.configuration = configuration
-        vc.fixedFilterStack = fixedFilterStack
-        return vc
-    }
-
     public class func stickersEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> StickersEditorViewController {
         // swiftlint:disable force_cast
         let vc = configuration.getClassForReplacedClass(StickersEditorViewController.self).init() as! StickersEditorViewController
@@ -118,33 +101,6 @@ extension InstanceFactory {
     public class func cropEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> CropEditorViewController {
         // swiftlint:disable force_cast
         let vc = configuration.getClassForReplacedClass(CropEditorViewController.self).init() as! CropEditorViewController
-        // swiftlint:enable force_cast
-        vc.configuration = configuration
-        vc.fixedFilterStack = fixedFilterStack
-        return vc
-    }
-
-    public class func brightnessEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> BrightnessEditorViewController {
-        // swiftlint:disable force_cast
-        let vc = configuration.getClassForReplacedClass(BrightnessEditorViewController.self).init() as! BrightnessEditorViewController
-        // swiftlint:enable force_cast
-        vc.configuration = configuration
-        vc.fixedFilterStack = fixedFilterStack
-        return vc
-    }
-
-    public class func contrastEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> ContrastEditorViewController {
-        // swiftlint:disable force_cast
-        let vc = configuration.getClassForReplacedClass(ContrastEditorViewController.self).init() as! ContrastEditorViewController
-        // swiftlint:enable force_cast
-        vc.configuration = configuration
-        vc.fixedFilterStack = fixedFilterStack
-        return vc
-    }
-
-    public class func saturationEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> SaturationEditorViewController {
-        // swiftlint:disable force_cast
-        let vc = configuration.getClassForReplacedClass(SaturationEditorViewController.self).init() as! SaturationEditorViewController
         // swiftlint:enable force_cast
         vc.configuration = configuration
         vc.fixedFilterStack = fixedFilterStack

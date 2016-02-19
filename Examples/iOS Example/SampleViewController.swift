@@ -87,9 +87,6 @@ class SampleViewController: UIViewController {
 
     private func customizeCameraController(builder: ConfigurationBuilder) {
         builder.configureCameraViewController { options in
-            // Setup a customized datasource, that offers a subset of all available filters
-            options.filtersDataSource = FiltersDataSource(availableFilters: [ .None, .Orchid, .Pale, .Summer ])
-
             // Enable/Disable some features
             options.cropToSquare = true
             options.maximumVideoLength = 15

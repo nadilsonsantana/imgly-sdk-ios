@@ -9,6 +9,7 @@
 import UIKit
 
 @objc(IMGLYPhotoEditToolControllerDelegate) public protocol PhotoEditToolControllerDelegate {
+    func photoEditToolControllerBaseImage(photoEditToolController: PhotoEditToolController) -> UIImage?
     func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController)
     func photoEditToolController(photoEditToolController: PhotoEditToolController, didDiscardChangesInFavorOfPhotoEditModel photoEditModel: IMGLYPhotoEditModel)
 }

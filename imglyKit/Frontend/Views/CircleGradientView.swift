@@ -42,10 +42,6 @@ import UIKit
         return CGPoint(x: controlPoint2.x / frame.size.width, y: controlPoint2.y / frame.size.height)
     }
 
-    private var tempPoint1: CGPoint?
-    private var tempPoint2: CGPoint?
-    private var tempLength: CGFloat?
-
     private var setup = false
 
     /**
@@ -136,62 +132,38 @@ import UIKit
     }
 
     private func informDelegateAboutRecognizerStates(recognizer recognizer: UIGestureRecognizer) {
-        if recognizer.state == UIGestureRecognizerState.Began {
-            if gradientViewDelegate != nil {
-                gradientViewDelegate!.gradientViewUserInteractionStarted(self)
-            }
+        if recognizer.state == .Began {
+            gradientViewDelegate?.gradientViewUserInteractionStarted(self)
         }
-        if recognizer.state == UIGestureRecognizerState.Ended {
-            if gradientViewDelegate != nil {
-                gradientViewDelegate!.gradientViewUserInteractionEnded(self)
-            }
+
+        if recognizer.state == .Ended || recognizer.state == .Cancelled {
+            gradientViewDelegate?.gradientViewUserInteractionEnded(self)
         }
     }
 
     @objc private func handlePanGesture(recognizer: UIPanGestureRecognizer) {
         informDelegateAboutRecognizerStates(recognizer: recognizer)
 
-        switch recognizer.state {
-        case .Began:
-            tempPoint1 = controlPoint1
-            tempPoint2 = controlPoint2
-        case .Changed:
-            let translation = recognizer.translationInView(self)
+        let translation = recognizer.translationInView(self)
 
-            if let tempPoint1 = tempPoint1, tempPoint2 = tempPoint2 {
-                controlPoint1 = CGPoint(x: tempPoint1.x + translation.x, y: tempPoint1.y + translation.y)
-                controlPoint2 = CGPoint(x: tempPoint2.x + translation.x, y: tempPoint2.y + translation.y)
-            }
-        case .Ended, .Cancelled:
-            tempPoint1 = nil
-            tempPoint2 = nil
-        default:
-            break
-        }
+        controlPoint1 = controlPoint1 + translation
+        controlPoint2 = controlPoint2 + translation
+
+        recognizer.setTranslation(CGPoint.zero, inView: self)
     }
 
     @objc private func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
         informDelegateAboutRecognizerStates(recognizer: recognizer)
-        if recognizer.numberOfTouches() > 1 {
-            switch recognizer.state {
-            case .Began:
-                tempLength = CGVector(startPoint: controlPoint1, endPoint: controlPoint2).length
-            case .Changed:
-                if let tempLength = tempLength {
-                    let vector1 = CGVector(startPoint: centerPoint, endPoint: controlPoint1).normalizedVector()
-                    let vector2 = CGVector(startPoint: centerPoint, endPoint: controlPoint2).normalizedVector()
 
-                    let length = tempLength * recognizer.scale / 2
+        let vector1 = CGVector(startPoint: centerPoint, endPoint: controlPoint1).normalizedVector()
+        let vector2 = CGVector(startPoint: centerPoint, endPoint: controlPoint2).normalizedVector()
 
-                    controlPoint1 = centerPoint + vector1 * length
-                    controlPoint2 = centerPoint + vector2 * length
-                }
-            case .Ended, .Cancelled:
-                tempLength = nil
-            default:
-                break
-            }
-        }
+        let length = CGVector(startPoint: controlPoint1, endPoint: controlPoint2).length * recognizer.scale / 2
+
+        controlPoint1 = centerPoint + vector1 * length
+        controlPoint2 = centerPoint + vector2 * length
+
+        recognizer.scale = 1
     }
 
     /**

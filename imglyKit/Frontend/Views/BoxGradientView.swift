@@ -51,10 +51,6 @@ public struct Line {
         }
     }
 
-    private var tempPoint1: CGPoint?
-    private var tempPoint2: CGPoint?
-    private var tempLength: CGFloat?
-
     private var setup = false
 
     // MARK: - setup
@@ -93,6 +89,7 @@ public struct Line {
         configureControlPoints()
         configurePanGestureRecognizer()
         configurePinchGestureRecognizer()
+        configureRotationGestureRecognizer()
 
         isAccessibilityElement = true
         accessibilityTraits |= UIAccessibilityTraitAdjustable
@@ -111,13 +108,20 @@ public struct Line {
     }
 
     private func configurePanGestureRecognizer() {
-        let panGestureRecognizer = UIPanGestureRecognizer(target:self, action: "handlePanGesture:")
+        let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handlePanGesture:")
         addGestureRecognizer(panGestureRecognizer)
     }
 
     private func configurePinchGestureRecognizer() {
-        let pinchGestureRecognizer = UIPinchGestureRecognizer(target:self, action: "handlePinchGesture:")
+        let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: "handlePinchGesture:")
+        pinchGestureRecognizer.delegate = self
         addGestureRecognizer(pinchGestureRecognizer)
+    }
+
+    private func configureRotationGestureRecognizer() {
+        let rotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: "handleRotationGesture:")
+        rotationGestureRecognizer.delegate = self
+        addGestureRecognizer(rotationGestureRecognizer)
     }
 
     // MARK: - drawing
@@ -187,12 +191,11 @@ public struct Line {
     }
 
     private func informDelegateAboutRecognizerStates(recognizer recognizer: UIGestureRecognizer) {
-        if recognizer.state == UIGestureRecognizerState.Began {
+        if recognizer.state == .Began {
             gradientViewDelegate?.gradientViewUserInteractionStarted(self)
         }
 
-        if recognizer.state == UIGestureRecognizerState.Ended ||
-            recognizer.state == UIGestureRecognizerState.Cancelled {
+        if recognizer.state == .Ended || recognizer.state == .Cancelled {
                 gradientViewDelegate?.gradientViewUserInteractionEnded(self)
         }
     }
@@ -200,52 +203,34 @@ public struct Line {
     @objc private func handlePanGesture(recognizer: UIPanGestureRecognizer) {
         informDelegateAboutRecognizerStates(recognizer: recognizer)
 
-        switch recognizer.state {
-        case .Began:
-            tempPoint1 = controlPoint1
-            tempPoint2 = controlPoint2
-        case .Changed:
-            let translation = recognizer.translationInView(self)
+        let translation = recognizer.translationInView(self)
 
-            if let tempPoint1 = tempPoint1, tempPoint2 = tempPoint2 {
-                controlPoint1 = CGPoint(x: tempPoint1.x + translation.x, y: tempPoint1.y + translation.y)
-                controlPoint2 = CGPoint(x: tempPoint2.x + translation.x, y: tempPoint2.y + translation.y)
-            }
-        case .Ended, .Cancelled:
-            tempPoint1 = nil
-            tempPoint2 = nil
-        default:
-            break
-        }
+        controlPoint1 = controlPoint1 + translation
+        controlPoint2 = controlPoint2 + translation
+
+        recognizer.setTranslation(CGPoint.zero, inView: self)
     }
 
     @objc private func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
         informDelegateAboutRecognizerStates(recognizer: recognizer)
 
-        switch recognizer.state {
-        case .Began:
-            tempPoint1 = recognizer.locationOfTouch(0, inView: self)
-            tempPoint2 = recognizer.locationOfTouch(1, inView: self)
-        case .Changed:
-            if let tempPoint1 = tempPoint1, tempPoint2 = tempPoint2 where recognizer.numberOfTouches() > 1 {
-                let touchLocation1 = recognizer.locationOfTouch(0, inView: self)
-                let touchLocation2 = recognizer.locationOfTouch(1, inView: self)
+        let vector1 = CGVector(startPoint: centerPoint, endPoint: controlPoint1).normalizedVector()
+        let vector2 = CGVector(startPoint: centerPoint, endPoint: controlPoint2).normalizedVector()
 
-                let touchVector1 = CGVector(startPoint: tempPoint1, endPoint: touchLocation1)
-                let touchVector2 = CGVector(startPoint: tempPoint2, endPoint: touchLocation2)
+        let length = CGVector(startPoint: controlPoint1, endPoint: controlPoint2).length * recognizer.scale / 2
 
-                controlPoint1 = controlPoint1 + touchVector1
-                controlPoint2 = controlPoint2 + touchVector2
+        controlPoint1 = centerPoint + vector1 * length
+        controlPoint2 = centerPoint + vector2 * length
 
-                self.tempPoint1 = recognizer.locationOfTouch(0, inView: self)
-                self.tempPoint2 = recognizer.locationOfTouch(1, inView: self)
-            }
-        case .Ended, .Cancelled:
-            tempPoint1 = nil
-            tempPoint2 = nil
-        default:
-            break
-        }
+        recognizer.scale = 1
+    }
+
+    @objc private func handleRotationGesture(recognizer: UIRotationGestureRecognizer) {
+        informDelegateAboutRecognizerStates(recognizer: recognizer)
+
+        rotateByRadians(recognizer.rotation)
+
+        recognizer.rotation = 0
     }
 
     /**
@@ -295,12 +280,10 @@ public struct Line {
         controlPoint2 = controlPoint2 - 10 * vector2
     }
 
-    @objc private func rotateLeft() -> Bool {
-        // Move control points by -10 degrees around centerPoint
-
+    private func rotateByRadians(radians: CGFloat) {
         // Calculate angle of new point
-        let angle1 = angleOfPoint(controlPoint1, onCircleAroundCenter: centerPoint) - CGFloat(10 * M_PI / 180)
-        let angle2 = angleOfPoint(controlPoint2, onCircleAroundCenter: centerPoint) - CGFloat(10 * M_PI / 180)
+        let angle1 = angleOfPoint(controlPoint1, onCircleAroundCenter: centerPoint) + radians
+        let angle2 = angleOfPoint(controlPoint2, onCircleAroundCenter: centerPoint) + radians
 
         // Calculate vector
         let vector1 = CGVector(startPoint: centerPoint, endPoint: controlPoint1)
@@ -313,31 +296,31 @@ public struct Line {
         // Calculate points
         controlPoint1 = CGPoint(x: radius1 * cos(angle1) + centerPoint.x, y: radius1 * sin(angle1) + centerPoint.y)
         controlPoint2 = CGPoint(x: radius2 * cos(angle2) + centerPoint.x, y: radius2 * sin(angle2) + centerPoint.y)
+    }
+
+    @objc private func rotateLeft() -> Bool {
+        // Move control points by -10 degrees around centerPoint
+        rotateByRadians(CGFloat(-10 * M_PI / 180))
         return true
     }
 
     @objc private func rotateRight() -> Bool {
         // Move control points by +10 degrees around centerPoint
-
-        // Calculate angle of new point
-        let angle1 = angleOfPoint(controlPoint1, onCircleAroundCenter: centerPoint) + CGFloat(10 * M_PI / 180)
-        let angle2 = angleOfPoint(controlPoint2, onCircleAroundCenter: centerPoint) + CGFloat(10 * M_PI / 180)
-
-        // Calculate vector
-        let vector1 = CGVector(startPoint: centerPoint, endPoint: controlPoint1)
-        let vector2 = CGVector(startPoint: centerPoint, endPoint: controlPoint2)
-
-        // Calculate radius
-        let radius1 = sqrt(vector1.dx * vector1.dx + vector1.dy * vector1.dy)
-        let radius2 = sqrt(vector2.dx * vector2.dx + vector2.dy * vector2.dy)
-
-        // Calculate points
-        controlPoint1 = CGPoint(x: radius1 * cos(angle1) + centerPoint.x, y: radius1 * sin(angle1) + centerPoint.y)
-        controlPoint2 = CGPoint(x: radius2 * cos(angle2) + centerPoint.x, y: radius2 * sin(angle2) + centerPoint.y)
+        rotateByRadians(CGFloat(10 * M_PI / 180))
         return true
     }
 
     private func angleOfPoint(point: CGPoint, onCircleAroundCenter center: CGPoint) -> CGFloat {
         return atan2(point.y - center.y, point.x - center.x)
+    }
+}
+
+extension BoxGradientView: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer is UIPinchGestureRecognizer && otherGestureRecognizer is UIRotationGestureRecognizer || gestureRecognizer is UIRotationGestureRecognizer && otherGestureRecognizer is UIPinchGestureRecognizer {
+            return true
+        }
+
+        return false
     }
 }

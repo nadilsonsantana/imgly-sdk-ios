@@ -134,6 +134,9 @@ import CoreImage
             if let outputImage = filter.outputImage {
                 editedImage = outputImage
             }
+
+            // Free memory
+            filter.setValue(nil, forKey: kCIInputImageKey)
         }
 
         // Color Adjustments
@@ -147,6 +150,9 @@ import CoreImage
                 if let outputImage = filter.outputImage {
                     editedImage = outputImage
                 }
+
+                // Free memory
+                filter.setValue(nil, forKey: kCIInputImageKey)
             }
         }
 

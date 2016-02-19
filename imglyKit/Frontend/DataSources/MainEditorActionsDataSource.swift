@@ -80,7 +80,7 @@ import UIKit
     // MARK: Default EditorActions
 
     private func itemsForAvailableActions(types: [MainEditorActionType]) -> [MainEditorAction] {
-        let bundle = NSBundle(forClass: MainEditorViewController.self)
+        let bundle = NSBundle(forClass: MainEditorActionsDataSource.self)
         var actions: [MainEditorAction] = []
         for actionType in types {
             switch actionType {

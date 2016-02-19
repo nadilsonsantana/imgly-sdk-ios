@@ -27,7 +27,6 @@ import CoreImage
         }()
 
     public var orientationCropFilter = InstanceFactory.orientationCropFilter()
-    public var effectFilter = InstanceFactory.effectFilterWithType(FilterType.None)
     public var brightnessFilter = InstanceFactory.colorAdjustmentFilter()
     public var tiltShiftFilter = InstanceFactory.tiltShiftFilter()
     public var borderFilter = InstanceFactory.borderFilter()
@@ -36,7 +35,7 @@ import CoreImage
     public var activeFilters: [Filter] {
         setCropRectForStickerFilters()
         setCropRectForTextFilters()
-        var activeFilters: [Filter] = [enhancementFilter, orientationCropFilter, tiltShiftFilter, effectFilter, brightnessFilter, borderFilter]
+        var activeFilters: [Filter] = [enhancementFilter, orientationCropFilter, tiltShiftFilter, brightnessFilter, borderFilter]
         activeFilters += spriteFilters
         return activeFilters
     }
@@ -134,7 +133,6 @@ extension FixedFilterStack: NSCopying {
         // swiftlint:disable force_cast
         copy.enhancementFilter = enhancementFilter.copyWithZone(zone) as! EnhancementFilter
         copy.orientationCropFilter = orientationCropFilter.copyWithZone(zone) as! OrientationCropFilter
-        copy.effectFilter = effectFilter.copyWithZone(zone) as! EffectFilter
         copy.brightnessFilter = brightnessFilter.copyWithZone(zone) as! ContrastBrightnessSaturationFilter
         copy.tiltShiftFilter = tiltShiftFilter.copyWithZone(zone) as! TiltshiftFilter
         copy.borderFilter = borderFilter.copyWithZone(zone) as! BorderFilter

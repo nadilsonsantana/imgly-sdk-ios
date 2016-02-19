@@ -13,84 +13,6 @@ import Foundation
   create filters, views, viewcontrollers and such.
 */
 @objc(IMGLYInstanceFactory) public class InstanceFactory: NSObject {
-    private static let filterTypeToFilter: [FilterType: ResponseFilter.Type] = [
-        .None: NoneFilter.self,
-        .K1: K1Filter.self,
-        .K2: K2Filter.self,
-        .K6: K6Filter.self,
-        .KDynamic: KDynamicFilter.self,
-        .Fridge: FridgeFilter.self,
-        .Breeze: BreezeFilter.self,
-        .Orchid: OrchidFilter.self,
-        .Chest: ChestFilter.self,
-        .Front: FrontFilter.self,
-        .Fixie: FixieFilter.self,
-        .X400: X400Filter.self,
-        .BW: BWFilter.self,
-        .AD1920: AD1920Filter.self,
-        .Lenin: LeninFilter.self,
-        .Quozi: QuoziFilter.self,
-        .Pola669: Pola669Filter.self,
-        .PolaSX: PolaSXFilter.self,
-        .Food: FoodFilter.self,
-        .Glam: GlamFilter.self,
-        .Celsius: CelsiusFilter.self,
-        .Texas: TexasFilter.self,
-        .Lomo: LomoFilter.self,
-        .Goblin: GoblinFilter.self,
-        .Sin: SinFilter.self,
-        .Mellow: MellowFilter.self,
-        .Soft: SoftFilter.self,
-        .Blues: BluesFilter.self,
-        .Elder: ElderFilter.self,
-        .Sunset: SunsetFilter.self,
-        .Evening: EveningFilter.self,
-        .Steel: SteelFilter.self,
-        .Seventies: SeventiesFilter.self,
-        .HighContrast: HighContrastFilter.self,
-        .BlueShadows: BlueShadowsFilter.self,
-        .Highcarb: HighcarbFilter.self,
-        .Eighties: EightiesFilter.self,
-        .Colorful: ColorfulFilter.self,
-        .Lomo100: Lomo100Filter.self,
-        .Pro400: Pro400Filter.self,
-        .Twilight: TwilightFilter.self,
-        .CottonCandy: CottonCandyFilter.self,
-        .Pale: PaleFilter.self,
-        .Settled: SettledFilter.self,
-        .Cool: CoolFilter.self,
-        .Litho: LithoFilter.self,
-        .Ancient: AncientFilter.self,
-        .Pitched: PitchedFilter.self,
-        .Lucid: LucidFilter.self,
-        .Creamy: CreamyFilter.self,
-        .Keen: KeenFilter.self,
-        .Tender: TenderFilter.self,
-        .Bleached: BleachedFilter.self,
-        .BleachedBlue: BleachedBlueFilter.self,
-        .Fall: FallFilter.self,
-        .Winter: WinterFilter.self,
-        .SepiaHigh: SepiaHighFilter.self,
-        .Summer: SummerFilter.self,
-        .Classic: ClassicFilter.self,
-        .NoGreen: NoGreenFilter.self,
-        .Neat: NeatFilter.self,
-        .Plate: PlateFilter.self
-    ]
-
-
-    /**
-    Creates a response filter with the specified type.
-
-    - parameter type: The type of the filter that should be created.
-
-    - returns: A CIFilter object that realizes the desired filter.
-    */
-    public class func effectFilterWithType(type: FilterType) -> EffectFilter {
-        // swiftlint:disable force_cast
-        return filterTypeToFilter[type]!.init() as! EffectFilter
-        // swiftlint:enable force_cast
-    }
 
     /**
     Creates a text filter.
@@ -162,23 +84,6 @@ import Foundation
     */
     public class func scaleFilter() -> ScaleFilter {
         return ScaleFilter()
-    }
-
-    /**
-    Returns the list of filters, that should be available in the dialogs.
-    Change this list to select the set of filters you want to present to the user.
-    - returns: An array of filter types.
-    */
-    public class var availableFilterList: [FilterType] {
-        return [
-            .None, .K1, .K2, .K6, .KDynamic, .Fridge, .Breeze, .Orchid, .Chest, .Front, .Fixie,
-            .X400, .BW, .AD1920, .Lenin, .Quozi, .Pola669, .PolaSX, .Food, .Glam, .Celsius, .Texas,
-            .Lomo, .Goblin, .Sin, .Mellow, .Soft, .Blues, .Elder, .Sunset, .Evening, .Steel,
-            .Seventies, .HighContrast, .BlueShadows, .Highcarb, .Eighties, .Colorful, .Lomo100,
-            .Pro400, .Twilight, .CottonCandy, .Pale, .Settled, .Cool, .Litho, .Ancient, .Pitched,
-            .Lucid, .Creamy, .Keen, .Tender, .Bleached, .BleachedBlue, .Fall, .Winter, .SepiaHigh,
-            .Summer, .Classic, .NoGreen, .Neat, .Plate
-        ]
     }
 
     // MARK: - Font Related

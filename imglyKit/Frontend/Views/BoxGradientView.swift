@@ -32,9 +32,8 @@ public struct Line {
     public var controlPoint2 = CGPoint.zero {
         didSet {
             calculateCenterPointFromOtherControlPoints()
-            layoutCrosshair()
             setNeedsDisplay()
-            gradientViewDelegate?.controlPointChanged()
+            gradientViewDelegate?.gradientViewControlPointChanged(self)
         }
     }
 
@@ -52,7 +51,10 @@ public struct Line {
         }
     }
 
-    private var crossImageView = UIImageView()
+    private var tempPoint1: CGPoint?
+    private var tempPoint2: CGPoint?
+    private var tempLength: CGFloat?
+
     private var setup = false
 
     // MARK: - setup
@@ -89,7 +91,6 @@ public struct Line {
 
         backgroundColor = UIColor.clearColor()
         configureControlPoints()
-        configureCrossImageView()
         configurePanGestureRecognizer()
         configurePinchGestureRecognizer()
 
@@ -109,21 +110,13 @@ public struct Line {
         calculateCenterPointFromOtherControlPoints()
     }
 
-    private func configureCrossImageView() {
-        crossImageView.image = UIImage(named: "crosshair", inBundle: NSBundle(forClass: BoxGradientView.self), compatibleWithTraitCollection:nil)
-        crossImageView.userInteractionEnabled = true
-        crossImageView.frame = CGRect(x: 0, y: 0, width: crossImageView.image!.size.width, height: crossImageView.image!.size.height)
-        addSubview(crossImageView)
-    }
-
     private func configurePanGestureRecognizer() {
-        let panGestureRecognizer = UIPanGestureRecognizer(target:self, action:"handlePanGesture:")
+        let panGestureRecognizer = UIPanGestureRecognizer(target:self, action: "handlePanGesture:")
         addGestureRecognizer(panGestureRecognizer)
-        crossImageView.addGestureRecognizer(panGestureRecognizer)
     }
 
     private func configurePinchGestureRecognizer() {
-        let pinchGestureRecognizer = UIPinchGestureRecognizer(target:self, action:"handlePinchGesture:")
+        let pinchGestureRecognizer = UIPinchGestureRecognizer(target:self, action: "handlePinchGesture:")
         addGestureRecognizer(pinchGestureRecognizer)
     }
 
@@ -134,20 +127,13 @@ public struct Line {
             frame.size.height * frame.size.height)
     }
 
-    private func normalizedOrtogonalVector() -> CGPoint {
-        let diffX = controlPoint2.x - controlPoint1.x
-        let diffY = controlPoint2.y - controlPoint1.y
-
-        let diffLength = sqrt(diffX * diffX + diffY  * diffY)
-
-        return CGPoint(x: -diffY / diffLength, y: diffX / diffLength)
+    private func normalizedOrtogonalVector() -> CGVector {
+        let vector = CGVector(startPoint: controlPoint1, endPoint: controlPoint2)
+        return CGVector(dx: -vector.dy / vector.length, dy: vector.dx / vector.length)
     }
 
     private func distanceBetweenControlPoints() -> CGFloat {
-        let diffX = controlPoint2.x - controlPoint1.x
-        let diffY = controlPoint2.y - controlPoint1.y
-
-        return sqrt(diffX * diffX + diffY  * diffY)
+        return CGVector(startPoint: controlPoint1, endPoint: controlPoint2).length
     }
 
     /*
@@ -161,12 +147,9 @@ public struct Line {
     private func lineForControlPoint(controlPoint: CGPoint) -> Line {
         let ortogonalVector = normalizedOrtogonalVector()
         let halfDiagonalLengthOfFrame = diagonalLengthOfFrame()
-        let scaledOrthogonalVector = CGPoint(x: halfDiagonalLengthOfFrame * ortogonalVector.x,
-            y: halfDiagonalLengthOfFrame * ortogonalVector.y)
-        let lineStart = CGPoint(x: controlPoint.x - scaledOrthogonalVector.x,
-            y: controlPoint.y - scaledOrthogonalVector.y)
-        let lineEnd = CGPoint(x: controlPoint.x + scaledOrthogonalVector.x,
-            y: controlPoint.y + scaledOrthogonalVector.y)
+        let scaledOrthogonalVector = halfDiagonalLengthOfFrame * ortogonalVector
+        let lineStart = controlPoint - scaledOrthogonalVector
+        let lineEnd = controlPoint + scaledOrthogonalVector
         return Line(start: lineStart, end: lineEnd)
     }
 
@@ -189,60 +172,80 @@ public struct Line {
      */
     public override func drawRect(rect: CGRect) {
         let aPath = UIBezierPath()
-        UIColor(white: 0.8, alpha: 1.0).setStroke()
+        UIColor.whiteColor().setStroke()
         addLineForControlPoint1ToPath(aPath)
         addLineForControlPoint2ToPath(aPath)
         aPath.closePath()
 
-        aPath.lineWidth = 1
+        aPath.lineWidth = 2
         aPath.stroke()
     }
 
     // MARK: - gesture handling
     private func calculateCenterPointFromOtherControlPoints() {
-        centerPoint = CGPoint(x: (controlPoint1.x + controlPoint2.x) / 2.0,
-            y: (controlPoint1.y + controlPoint2.y) / 2.0)
+        centerPoint = (controlPoint1 + controlPoint2) * 0.5
     }
 
-    private func informDeletageAboutRecognizerStates(recognizer recognizer: UIGestureRecognizer) {
+    private func informDelegateAboutRecognizerStates(recognizer recognizer: UIGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.Began {
-            if gradientViewDelegate != nil {
-                gradientViewDelegate!.userInteractionStarted()
-            }
+            gradientViewDelegate?.gradientViewUserInteractionStarted(self)
         }
+
         if recognizer.state == UIGestureRecognizerState.Ended ||
             recognizer.state == UIGestureRecognizerState.Cancelled {
-                if gradientViewDelegate != nil {
-                    gradientViewDelegate!.userInteractionEnded()
-                }
+                gradientViewDelegate?.gradientViewUserInteractionEnded(self)
         }
     }
 
     @objc private func handlePanGesture(recognizer: UIPanGestureRecognizer) {
-        let location = recognizer.locationInView(self)
-        informDeletageAboutRecognizerStates(recognizer: recognizer)
-        let diffX = location.x - centerPoint.x
-        let diffY = location.y - centerPoint.y
-        controlPoint1 = CGPoint(x: controlPoint1.x + diffX, y: controlPoint1.y + diffY)
-        controlPoint2 = CGPoint(x: controlPoint2.x + diffX, y: controlPoint2.y + diffY)
-    }
+        informDelegateAboutRecognizerStates(recognizer: recognizer)
 
-    @objc private func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
-        informDeletageAboutRecognizerStates(recognizer: recognizer)
-        if recognizer.numberOfTouches() > 1 {
-            controlPoint1 = recognizer.locationOfTouch(0, inView:self)
-            controlPoint2 = recognizer.locationOfTouch(1, inView:self)
+        switch recognizer.state {
+        case .Began:
+            tempPoint1 = controlPoint1
+            tempPoint2 = controlPoint2
+        case .Changed:
+            let translation = recognizer.translationInView(self)
+
+            if let tempPoint1 = tempPoint1, tempPoint2 = tempPoint2 {
+                controlPoint1 = CGPoint(x: tempPoint1.x + translation.x, y: tempPoint1.y + translation.y)
+                controlPoint2 = CGPoint(x: tempPoint2.x + translation.x, y: tempPoint2.y + translation.y)
+            }
+        case .Ended, .Cancelled:
+            tempPoint1 = nil
+            tempPoint2 = nil
+        default:
+            break
         }
     }
 
-    private func isPoint(point: CGPoint, inRect rect: CGRect) -> Bool {
-        let top = rect.origin.y
-        let bottom = top + rect.size.height
-        let left = rect.origin.x
-        let right = left + rect.size.width
-        let inRectXAxis = point.x > left && point.x < right
-        let inRectYAxis = point.y > top && point.y < bottom
-        return (inRectXAxis && inRectYAxis)
+    @objc private func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
+        informDelegateAboutRecognizerStates(recognizer: recognizer)
+
+        switch recognizer.state {
+        case .Began:
+            tempPoint1 = recognizer.locationOfTouch(0, inView: self)
+            tempPoint2 = recognizer.locationOfTouch(1, inView: self)
+        case .Changed:
+            if let tempPoint1 = tempPoint1, tempPoint2 = tempPoint2 where recognizer.numberOfTouches() > 1 {
+                let touchLocation1 = recognizer.locationOfTouch(0, inView: self)
+                let touchLocation2 = recognizer.locationOfTouch(1, inView: self)
+
+                let touchVector1 = CGVector(startPoint: tempPoint1, endPoint: touchLocation1)
+                let touchVector2 = CGVector(startPoint: tempPoint2, endPoint: touchLocation2)
+
+                controlPoint1 = controlPoint1 + touchVector1
+                controlPoint2 = controlPoint2 + touchVector2
+
+                self.tempPoint1 = recognizer.locationOfTouch(0, inView: self)
+                self.tempPoint2 = recognizer.locationOfTouch(1, inView: self)
+            }
+        case .Ended, .Cancelled:
+            tempPoint1 = nil
+            tempPoint2 = nil
+        default:
+            break
+        }
     }
 
     /**
@@ -250,12 +253,6 @@ public struct Line {
      */
     public override func layoutSubviews() {
         super.layoutSubviews()
-        layoutCrosshair()
-        setNeedsDisplay()
-    }
-
-    private func layoutCrosshair() {
-        crossImageView.center = centerPoint
 
         let line1 = lineForControlPoint(controlPoint1)
         let line2 = lineForControlPoint(controlPoint2)

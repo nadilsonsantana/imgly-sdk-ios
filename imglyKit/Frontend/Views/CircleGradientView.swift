@@ -27,9 +27,8 @@ import UIKit
     public var controlPoint2 = CGPoint.zero {
         didSet {
             calculateCenterPointFromOtherControlPoints()
-            layoutCrosshair()
             setNeedsDisplay()
-            gradientViewDelegate?.controlPointChanged()
+            gradientViewDelegate?.gradientViewControlPointChanged(self)
         }
     }
 
@@ -43,7 +42,10 @@ import UIKit
         return CGPoint(x: controlPoint2.x / frame.size.width, y: controlPoint2.y / frame.size.height)
     }
 
-    private var crossImageView = UIImageView()
+    private var tempPoint1: CGPoint?
+    private var tempPoint2: CGPoint?
+    private var tempLength: CGFloat?
+
     private var setup = false
 
     /**
@@ -78,7 +80,6 @@ import UIKit
 
         backgroundColor = UIColor.clearColor()
         configureControlPoints()
-        configureCrossImageView()
         configurePanGestureRecognizer()
         configurePinchGestureRecognizer()
 
@@ -94,17 +95,9 @@ import UIKit
         calculateCenterPointFromOtherControlPoints()
     }
 
-    private func configureCrossImageView() {
-        crossImageView.image = UIImage(named: "crosshair", inBundle: NSBundle(forClass: CircleGradientView.self), compatibleWithTraitCollection:nil)
-        crossImageView.userInteractionEnabled = true
-        crossImageView.frame = CGRect(x: 0, y: 0, width: crossImageView.image!.size.width, height: crossImageView.image!.size.height)
-        addSubview(crossImageView)
-    }
-
     public func configurePanGestureRecognizer() {
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handlePanGesture:")
         addGestureRecognizer(panGestureRecognizer)
-        crossImageView.addGestureRecognizer(panGestureRecognizer)
     }
 
     public func configurePinchGestureRecognizer() {
@@ -123,57 +116,81 @@ import UIKit
      - parameter rect: The portion of the view’s bounds that needs to be updated.
      */
     public override func drawRect(rect: CGRect) {
-        let aPath = UIBezierPath(arcCenter: centerPoint, radius: distanceBetweenControlPoints() * 0.5, startAngle: 0,
-            endAngle:CGFloat(M_PI * 2.0), clockwise: true)
-        UIColor(white: 0.8, alpha: 1.0).setStroke()
+        let aPath = UIBezierPath(arcCenter: centerPoint, radius: distanceBetweenControlPoints() * 0.5, startAngle: 0, endAngle: CGFloat(M_PI * 2.0), clockwise: true)
+        UIColor.whiteColor().setStroke()
         aPath.closePath()
 
         let aRef = UIGraphicsGetCurrentContext()
         CGContextSaveGState(aRef)
-        aPath.lineWidth = 1
+        aPath.lineWidth = 2
         aPath.stroke()
         CGContextRestoreGState(aRef)
     }
 
     private func distanceBetweenControlPoints() -> CGFloat {
-        let diffX = controlPoint2.x - controlPoint1.x
-        let diffY = controlPoint2.y - controlPoint1.y
-
-        return sqrt(diffX * diffX + diffY  * diffY)
+        return CGVector(startPoint: controlPoint1, endPoint: controlPoint2).length
     }
 
     private func calculateCenterPointFromOtherControlPoints() {
-        centerPoint = CGPoint(x: (controlPoint1.x + controlPoint2.x) / 2.0,
-            y: (controlPoint1.y + controlPoint2.y) / 2.0)
+        centerPoint = (controlPoint1 + controlPoint2) * 0.5
     }
 
     private func informDelegateAboutRecognizerStates(recognizer recognizer: UIGestureRecognizer) {
         if recognizer.state == UIGestureRecognizerState.Began {
             if gradientViewDelegate != nil {
-                gradientViewDelegate!.userInteractionStarted()
+                gradientViewDelegate!.gradientViewUserInteractionStarted(self)
             }
         }
         if recognizer.state == UIGestureRecognizerState.Ended {
             if gradientViewDelegate != nil {
-                gradientViewDelegate!.userInteractionEnded()
+                gradientViewDelegate!.gradientViewUserInteractionEnded(self)
             }
         }
     }
 
     @objc private func handlePanGesture(recognizer: UIPanGestureRecognizer) {
-        let location = recognizer.locationInView(self)
         informDelegateAboutRecognizerStates(recognizer: recognizer)
-        let diffX = location.x - centerPoint.x
-        let diffY = location.y - centerPoint.y
-        controlPoint1 = CGPoint(x: controlPoint1.x + diffX, y: controlPoint1.y + diffY)
-        controlPoint2 = CGPoint(x: controlPoint2.x + diffX, y: controlPoint2.y + diffY)
+
+        switch recognizer.state {
+        case .Began:
+            tempPoint1 = controlPoint1
+            tempPoint2 = controlPoint2
+        case .Changed:
+            let translation = recognizer.translationInView(self)
+
+            if let tempPoint1 = tempPoint1, tempPoint2 = tempPoint2 {
+                controlPoint1 = CGPoint(x: tempPoint1.x + translation.x, y: tempPoint1.y + translation.y)
+                controlPoint2 = CGPoint(x: tempPoint2.x + translation.x, y: tempPoint2.y + translation.y)
+            }
+        case .Ended, .Cancelled:
+            tempPoint1 = nil
+            tempPoint2 = nil
+        default:
+            break
+        }
     }
 
     @objc private func handlePinchGesture(recognizer: UIPinchGestureRecognizer) {
         informDelegateAboutRecognizerStates(recognizer: recognizer)
         if recognizer.numberOfTouches() > 1 {
-            controlPoint1 = recognizer.locationOfTouch(0, inView:self)
-            controlPoint2 = recognizer.locationOfTouch(1, inView:self)
+            switch recognizer.state {
+            case .Began:
+                tempLength = CGVector(startPoint: controlPoint1, endPoint: controlPoint2).length
+            case .Changed:
+                if let tempLength = tempLength {
+                    let vector1 = CGVector(startPoint: centerPoint, endPoint: controlPoint1).normalizedVector()
+                    let vector2 = CGVector(startPoint: centerPoint, endPoint: controlPoint2).normalizedVector()
+
+                    let length = tempLength * recognizer.scale / 2
+
+                    controlPoint1 = centerPoint + vector1 * length
+                    controlPoint2 = centerPoint + vector2 * length
+                }
+            case .Ended, .Cancelled:
+                tempLength = nil
+            default:
+                break
+            }
         }
     }
 
@@ -182,12 +199,6 @@ import UIKit
      */
     public override func layoutSubviews() {
         super.layoutSubviews()
-        layoutCrosshair()
-        setNeedsDisplay()
-    }
-
-    private func layoutCrosshair() {
-        crossImageView.center = centerPoint
 
         let distance = distanceBetweenControlPoints()
         accessibilityFrame = convertRect(CGRect(x: centerPoint.x - distance / 2, y: centerPoint.y - distance / 2, width: distance, height: distance), toView: nil)

@@ -3,10 +3,10 @@
 // Copyright (c) 2015 9elements GmbH. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 @objc(IMGLYGradientViewDelegate) public protocol GradientViewDelegate {
-    func userInteractionStarted()
-    func userInteractionEnded()
-    func controlPointChanged()
+    func gradientViewUserInteractionStarted(gradientView: UIView)
+    func gradientViewUserInteractionEnded(gradientView: UIView)
+    func gradientViewControlPointChanged(gradientView: UIView)
 }

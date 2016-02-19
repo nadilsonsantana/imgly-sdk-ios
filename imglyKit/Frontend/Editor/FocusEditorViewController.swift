@@ -258,16 +258,16 @@ import UIKit
 }
 
 extension FocusEditorViewController: GradientViewDelegate {
-    public func userInteractionStarted() {
+    public func gradientViewUserInteractionStarted(gradientView: UIView) {
         fixedFilterStack.tiltShiftFilter.tiltShiftType = .Off
         updatePreviewImage()
     }
 
-    public func userInteractionEnded() {
+    public func gradientViewUserInteractionEnded(gradientView: UIView) {
         updateFilterTypeAndPreview()
     }
 
-    public func controlPointChanged() {
+    public func gradientViewControlPointChanged(gradientView: UIView) {
 
     }
 }

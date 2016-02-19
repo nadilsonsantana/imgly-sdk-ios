@@ -16,6 +16,10 @@ func * (lhs: CGVector, rhs: CGFloat) -> CGVector {
     return CGVector(dx: lhs.dx * rhs, dy: lhs.dy * rhs)
 }
 
+func * (lhs: CGVector, rhs: CGVector) -> CGVector {
+    return CGVector(dx: lhs.dx * rhs.dx, dy: lhs.dy * rhs.dy)
+}
+
 func + (lhs: CGVector, rhs: CGPoint) -> CGPoint {
     return CGPoint(x: lhs.dx + rhs.x, y: lhs.dy + rhs.y)
 }
@@ -44,8 +48,13 @@ extension CGVector {
         return copy
     }
 
+    var length: CGFloat {
+        return sqrt(dx * dx + dy * dy)
+    }
+
     mutating func normalize() {
-        let length = sqrt(dx * dx + dy * dy)
+        let length = self.length
+
         dx = dx / length
         dy = dy / length
     }

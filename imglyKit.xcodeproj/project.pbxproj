@@ -86,6 +86,9 @@
 		2B1ADAE01B19CBB900C98522 /* imglyKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BF4D3891AF1139600C801B2 /* imglyKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2B1ADAE21B19CD5500C98522 /* NSImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1ADAE11B19CD5500C98522 /* NSImageExtension.swift */; };
 		2B1ADAE41B19D0C800C98522 /* NSAffineTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1ADAE31B19D0C800C98522 /* NSAffineTransformExtension.swift */; };
+		2B1B048F1C77796B00074A28 /* Enums.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B1B048E1C77788600074A28 /* Enums.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2B1B04901C77796C00074A28 /* Enums.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B1B048E1C77788600074A28 /* Enums.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2B1B04921C77937A00074A28 /* CGPointExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B04911C77937A00074A28 /* CGPointExtension.swift */; };
 		2B1B173E1C7335870083165B /* ToolStackControllerOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B173D1C7335870083165B /* ToolStackControllerOptions.swift */; };
 		2B1B17421C7343430083165B /* ToolStackItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B17411C7343430083165B /* ToolStackItem.swift */; };
 		2B1B9AF61C52625100C6D276 /* CGVectorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */; };
@@ -409,6 +412,8 @@
 		2B1ADA1D1B19C86300C98522 /* imglyKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = imglyKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B1ADAE11B19CD5500C98522 /* NSImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSImageExtension.swift; sourceTree = "<group>"; };
 		2B1ADAE31B19D0C800C98522 /* NSAffineTransformExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSAffineTransformExtension.swift; sourceTree = "<group>"; };
+		2B1B048E1C77788600074A28 /* Enums.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Enums.h; sourceTree = "<group>"; };
+		2B1B04911C77937A00074A28 /* CGPointExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGPointExtension.swift; sourceTree = "<group>"; };
 		2B1B173D1C7335870083165B /* ToolStackControllerOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolStackControllerOptions.swift; sourceTree = "<group>"; };
 		2B1B17411C7343430083165B /* ToolStackItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolStackItem.swift; sourceTree = "<group>"; };
 		2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGVectorExtension.swift; sourceTree = "<group>"; };
@@ -724,6 +729,7 @@
 		2B1ADA0C1B19C33900C98522 /* Backend */ = {
 			isa = PBXGroup;
 			children = (
+				2B1B048E1C77788600074A28 /* Enums.h */,
 				2B1ADA0E1B19C36E00C98522 /* Extensions */,
 				2BF4D3A31AF113FD00C801B2 /* Filter Responses */,
 				2BF4D5411AF1159D00C801B2 /* FontImporter.swift */,
@@ -742,6 +748,7 @@
 			children = (
 				2BC101BA1C43C72000C04A47 /* AVCaptureDeviceExtension.swift */,
 				2BEBFEAA1C3FEF6400FAA95C /* AVCaptureVideoOrientationExtension.swift */,
+				2B1B04911C77937A00074A28 /* CGPointExtension.swift */,
 				2BEBFEAC1C3FF0CD00FAA95C /* CGRectExtension.swift */,
 				2B4468DD1C6C9D5E00A2626B /* CGSizeExtension.swift */,
 				2B1B9AF51C52625100C6D276 /* CGVectorExtension.swift */,
@@ -1097,6 +1104,7 @@
 				2B9F75F61C68AC4300E5723B /* IMGLYRenderMode.h in Headers */,
 				2B1ADAE01B19CBB900C98522 /* imglyKit.h in Headers */,
 				2B91DEFF1C64EEC900B559D3 /* IMGLYPhotoEditModel.h in Headers */,
+				2B1B04901C77796C00074A28 /* Enums.h in Headers */,
 				2B1ADA9A1B19C8E500C98522 /* LUTToNSDataConverter.h in Headers */,
 				2B91DF051C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.h in Headers */,
 			);
@@ -1109,6 +1117,7 @@
 				2B9F75F51C68AC4300E5723B /* IMGLYRenderMode.h in Headers */,
 				2BF4D38A1AF1139600C801B2 /* imglyKit.h in Headers */,
 				2B91DEFE1C64EEC900B559D3 /* IMGLYPhotoEditModel.h in Headers */,
+				2B1B048F1C77796B00074A28 /* Enums.h in Headers */,
 				2BF4D53D1AF1156F00C801B2 /* LUTToNSDataConverter.h in Headers */,
 				2B91DF041C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.h in Headers */,
 			);
@@ -1619,6 +1628,7 @@
 				2B54ED841C7628AD00F6855E /* IconCaptionCollectionViewCell.swift in Sources */,
 				093D11211C60F90800B72B7A /* ZoomingImageView.swift in Sources */,
 				2BF51DE41C722AEF00BFE25D /* FilterToolController.swift in Sources */,
+				2B1B04921C77937A00074A28 /* CGPointExtension.swift in Sources */,
 				2BFC627C1C720CC2006991D2 /* SeparatorCollectionViewCell.swift in Sources */,
 				E9AF1E621C0F2E0D00893621 /* MainEditorActionsDataSource.swift in Sources */,
 				2BC537951C513A2200A7DE17 /* FocusEditorViewControllerOptions.swift in Sources */,

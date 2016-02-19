@@ -13,7 +13,7 @@ import Photos
 
 private let kIndicatorSize = CGFloat(75)
 private let kShowFilterIntensitySliderInterval = NSTimeInterval(2)
-private let kFilterSelectionViewHeight = 100
+private let kFilterSelectionViewHeight = 80
 private let kBottomControlSize = CGSize(width: 47, height: 47)
 public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
 
@@ -290,7 +290,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
 
             swipeRightGestureRecognizer.enabled = buttonsEnabled
             swipeLeftGestureRecognizer.enabled = buttonsEnabled
-            filterSelectionController.view.userInteractionEnabled = buttonsEnabled
+            filterSelectionController.collectionView.userInteractionEnabled = buttonsEnabled
             filterSelectionButton.enabled = buttonsEnabled
         }
     }
@@ -326,23 +326,8 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
     /**
      :nodoc:
      */
-    public override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-
-        if let filterSelectionViewConstraint = filterSelectionViewConstraint where filterSelectionViewConstraint.constant != 0 {
-            filterSelectionController.beginAppearanceTransition(true, animated: animated)
-        }
-    }
-
-    /**
-     :nodoc:
-     */
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-
-        if let filterSelectionViewConstraint = filterSelectionViewConstraint where filterSelectionViewConstraint.constant != 0 {
-            filterSelectionController.endAppearanceTransition()
-        }
 
         setLastImageFromRollAsPreview()
         cameraController?.startCamera()
@@ -354,21 +339,6 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
     public override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         cameraController?.stopCamera()
-
-        if let filterSelectionViewConstraint = filterSelectionViewConstraint where filterSelectionViewConstraint.constant != 0 {
-            filterSelectionController.beginAppearanceTransition(false, animated: animated)
-        }
-    }
-
-    /**
-     :nodoc:
-     */
-    public override func viewDidDisappear(animated: Bool) {
-        super.viewDidDisappear(animated)
-
-        if let filterSelectionViewConstraint = filterSelectionViewConstraint where filterSelectionViewConstraint.constant != 0 {
-            filterSelectionController.endAppearanceTransition()
-        }
     }
 
     /**
@@ -430,9 +400,8 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
         view.addSubview(topControlsView)
         view.addSubview(bottomControlsView)
 
-        addChildViewController(filterSelectionController)
-        filterSelectionController.didMoveToParentViewController(self)
-        view.addSubview(filterSelectionController.view)
+        filterSelectionController.collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(filterSelectionController.collectionView)
 
         topControlsView.addSubview(flashButton)
 
@@ -463,7 +432,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
             "topControlsView" : topControlsView,
             "cameraPreviewContainer" : cameraPreviewContainer,
             "bottomControlsView" : bottomControlsView,
-            "filterSelectionView" : filterSelectionController.view,
+            "filterSelectionView" : filterSelectionController.collectionView,
             "flashButton" : flashButton,
             "switchCameraButton" : switchCameraButton,
             "cameraRollButton" : cameraRollButton,
@@ -499,7 +468,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
         view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:[bottomControlsView][filterSelectionView(==filterSelectionViewHeight)]", options: [], metrics: metrics, views: views))
         view.addConstraint(NSLayoutConstraint(item: filterIntensitySlider, attribute: .Bottom, relatedBy: .Equal, toItem: bottomControlsView, attribute: .Top, multiplier: 1, constant: -20))
 
-        filterSelectionViewConstraint = NSLayoutConstraint(item: filterSelectionController.view, attribute: .Top, relatedBy: .Equal, toItem: bottomLayoutGuide, attribute: .Bottom, multiplier: 1, constant: 0)
+        filterSelectionViewConstraint = NSLayoutConstraint(item: filterSelectionController.collectionView, attribute: .Top, relatedBy: .Equal, toItem: bottomLayoutGuide, attribute: .Bottom, multiplier: 1, constant: 0)
         view.addConstraint(filterSelectionViewConstraint!)
     }
 
@@ -922,7 +891,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
 
         topControlsView.backgroundColor = color
         bottomControlsView.backgroundColor = color
-        filterSelectionController.collectionView?.backgroundColor = color
+        filterSelectionController.collectionView.backgroundColor = color
     }
 
     private func addActionButtonToContainer(actionButton: UIControl) {
@@ -936,23 +905,18 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
         hideSliderTimer = NSTimer.scheduledTimerWithTimeInterval(kShowFilterIntensitySliderInterval, target: self, selector: "hideFilterIntensitySlider:", userInfo: nil, repeats: false)
     }
 
-    private func showEditorNavigationControllerWithImage(image: UIImage) {
+    private func showEditorWithImage(image: UIImage) {
         // swiftlint:disable force_cast
-        let editorViewController = self.configuration.getClassForReplacedClass(MainEditorViewController.self).init() as! MainEditorViewController
+        let photoEditViewController = (self.configuration.getClassForReplacedClass(PhotoEditViewController.self) as! PhotoEditViewController.Type).init(photo: image, configuration: configuration)
         // swiftlint:enable force_cast
-        editorViewController.configuration = configuration
-        editorViewController.highResolutionImage = image
-        if let cameraController = cameraController {
-            editorViewController.initialFilterType = cameraController.effectFilter.filterType
-            editorViewController.initialFilterIntensity = cameraController.effectFilter.inputIntensity
-        }
-        editorViewController.completionBlock = editorCompletionBlock
+//        if let cameraController = cameraController {
+//            editorViewController.initialFilterType = cameraController.effectFilter.filterType
+//            editorViewController.initialFilterIntensity = cameraController.effectFilter.inputIntensity
+//        }
+//        editorViewController.completionBlock = editorCompletionBlock
 
-        let navigationController = NavigationController(rootViewController: editorViewController)
-        navigationController.navigationBar.barStyle = .Black
-        navigationController.navigationBar.translucent = false
-
-        self.presentViewController(navigationController, animated: true, completion: nil)
+        let toolStackController = ToolStackController(photoEditViewController: photoEditViewController)
+        self.presentViewController(toolStackController, animated: true, completion: nil)
     }
 
     private func saveMovieWithMovieURLToAssets(movieURL: NSURL) {
@@ -1266,7 +1230,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
                         completionBlock(updatedImage, nil)
                     } else {
                         if let updatedImage = updatedImage {
-                            self.showEditorNavigationControllerWithImage(updatedImage)
+                            self.showEditorWithImage(updatedImage)
                         }
                     }
                 }
@@ -1301,24 +1265,18 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
 
             if filterSelectionViewConstraint.constant == 0 {
                 // Expand
-                filterSelectionController.beginAppearanceTransition(true, animated: true)
                 filterSelectionViewConstraint.constant = -1 * CGFloat(kFilterSelectionViewHeight)
                 UIView.animateWithDuration(animationDuration, delay: 0, usingSpringWithDamping: dampingFactor, initialSpringVelocity: 0, options: [], animations: {
                     sender?.transform = CGAffineTransformIdentity
                     self.view.layoutIfNeeded()
-                    }, completion: { finished in
-                        self.filterSelectionController.endAppearanceTransition()
-                })
+                    }, completion: nil)
             } else {
                 // Close
-                filterSelectionController.beginAppearanceTransition(false, animated: true)
                 filterSelectionViewConstraint.constant = 0
                 UIView.animateWithDuration(animationDuration, delay: 0, usingSpringWithDamping: dampingFactor, initialSpringVelocity: 0, options: [], animations: {
                     sender?.transform = CGAffineTransformMakeRotation(CGFloat(M_PI))
                     self.view.layoutIfNeeded()
-                    }, completion: { finished in
-                        self.filterSelectionController.endAppearanceTransition()
-                })
+                    }, completion: nil)
             }
         }
     }
@@ -1498,7 +1456,7 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
                 completionBlock(image, nil)
             } else {
                 if let image = image {
-                    self.showEditorNavigationControllerWithImage(image)
+                    self.showEditorWithImage(image)
                 }
             }
         })

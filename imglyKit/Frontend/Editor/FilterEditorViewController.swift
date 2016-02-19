@@ -105,11 +105,9 @@ import UIKit
             return nil
         }
 
-        let views = [ "filterSelectionView" : filterSelectionController.view ]
+        let views = [ "filterSelectionView" : filterSelectionController.collectionView ]
 
-        addChildViewController(filterSelectionController)
-        filterSelectionController.didMoveToParentViewController(self)
-        bottomContainerView.addSubview(filterSelectionController.view)
+        bottomContainerView.addSubview(filterSelectionController.collectionView)
 
         bottomContainerView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[filterSelectionView]|", options: [], metrics: nil, views: views))
         bottomContainerView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[filterSelectionView]|", options: [], metrics: nil, views: views))

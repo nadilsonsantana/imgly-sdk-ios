@@ -39,20 +39,15 @@ class SampleViewController: UIViewController {
     }
 
     @IBAction func showDefaultEditor(sender: UIButton) {
-        let defaultBlue = view.tintColor
         if let window = UIApplication.sharedApplication().delegate?.window! {
             window.tintColor = UIColor.whiteColor()
         }
 
         let sampleImage = UIImage(named: "sample_image")
-        let mainEditorViewController = MainEditorViewController()
-        mainEditorViewController.highResolutionImage = sampleImage
+        let photoEditViewController = PhotoEditViewController(photo: sampleImage!)
+        let toolStackController = ToolStackController(photoEditViewController: photoEditViewController)
 
-        let navigationController = NavigationController(rootViewController: mainEditorViewController)
-        navigationController.navigationBar.barStyle = .Black
-        navigationController.navigationBar.translucent = false
-        navigationController.navigationBar.tintColor = defaultBlue
-        presentViewController(navigationController, animated: true, completion: nil)
+        presentViewController(toolStackController, animated: true, completion: nil)
     }
 
     @IBAction func showCustomized(sender: UIButton) {

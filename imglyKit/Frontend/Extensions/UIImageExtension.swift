@@ -142,6 +142,28 @@ public extension UIImage {
 
         return UIColor(red: r, green: g, blue: b, alpha: a)
     }
+
+    public func imgly_drawInRect(rect: CGRect, withContentMode contentMode: UIViewContentMode) {
+        switch contentMode {
+        case .ScaleAspectFill:
+            let sourceScale = size.width / size.height
+            let targetScale = rect.width / rect.height
+
+            if targetScale > sourceScale {
+                let fittedWidth = size.width * rect.width / size.height
+                let x = rect.midX + fittedWidth * -0.5
+
+                drawInRect(CGRect(x: x, y: rect.origin.y, width: fittedWidth, height: rect.height))
+            } else {
+                let fittedHeight = size.height * rect.height / size.width
+                let y = rect.midY + fittedHeight * -0.5
+
+                drawInRect(CGRect(x: rect.origin.x, y: y, width: rect.width, height: fittedHeight))
+            }
+        default:
+            fatalError("Content mode \(contentMode) is not supported.")
+        }
+    }
 }
 
 extension UIImageOrientation: CustomStringConvertible {

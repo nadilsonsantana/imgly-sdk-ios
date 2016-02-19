@@ -100,7 +100,7 @@ import UIKit
         }
 
         let sliderContainerView = UIView()
-        sliderContainerView.backgroundColor = UIColor.blackColor()
+        sliderContainerView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.8)
         sliderContainerView.translatesAutoresizingMaskIntoConstraints = false
         sliderContainerView.alpha = activeAdjustTool == nil ? 0 : 1
         view.addSubview(sliderContainerView)

@@ -404,12 +404,16 @@ import UIKit
         }
 
         if animated {
+            // Hide child view
+            toolController.view.alpha = 0
+
             // Move toolbars offscreen
             toolbarContainer.mainToolbar.transform = CGAffineTransformMakeTranslation(0, 124)
             toolbarContainer.secondaryToolbar.transform = CGAffineTransformMakeTranslation(0, 44)
 
-            // Fade out toolbar that's 'behind' the newly pushed toolbar and update layout
+            // Fade out toolbar that's 'behind' the newly pushed toolbar, fade in child view and update layout
             UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
+                toolController.view.alpha = 1
                 previousToolbarContainer?.mainToolbar.alpha = 0.3
                 self.photoEditViewController.updateLayoutForNewToolController()
                 }) { _ in
@@ -478,12 +482,14 @@ import UIKit
         }
 
         if animated {
-            // Fade in toolbar that's 'behind' the popped toolbar and update layout
+            // Fade in toolbar that's 'behind' the popped toolbar, fade out child view and update layout
             UIView.animateWithDuration(0.28, delay: 0, options: [.CurveEaseInOut], animations: {
+                toolController.view.alpha = 0
                 previousToolbarContainer?.mainToolbar.alpha = 1
                 self.photoEditViewController.updateLayoutForNewToolController()
                 }) { _ in
                     cleanupClosure()
+                    toolController.view.alpha = 1
             }
 
             // Move main toolbar offscreen

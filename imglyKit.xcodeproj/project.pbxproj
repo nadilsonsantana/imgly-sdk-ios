@@ -257,6 +257,7 @@
 		2B91DF0A1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */; };
 		2B91DF0B1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */; };
 		2B948C361C5B6A0900094CAE /* CGAffineTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */; };
+		2B9BC6441C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BC6431C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift */; };
 		2B9F75F21C68A38400E5723B /* PhotoEditRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */; };
 		2B9F75F31C68A38400E5723B /* PhotoEditRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */; };
 		2B9F75F51C68AC4300E5723B /* IMGLYRenderMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -582,6 +583,7 @@
 		2B91DF081C64FAD400B559D3 /* IMGLYPhotoEditModel+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMGLYPhotoEditModel+Private.h"; sourceTree = "<group>"; };
 		2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IMGLYOrientation.swift; sourceTree = "<group>"; };
 		2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGAffineTransformExtension.swift; sourceTree = "<group>"; };
+		2B9BC6431C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEffectThumbnailRenderer.swift; sourceTree = "<group>"; };
 		2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEditRenderer.swift; sourceTree = "<group>"; };
 		2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMGLYRenderMode.h; sourceTree = "<group>"; };
 		2BA5DB9D1C562FDC0038570A /* CropRatio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropRatio.swift; sourceTree = "<group>"; };
@@ -908,6 +910,7 @@
 		2B1ADA0B1B19C33600C98522 /* Frontend */ = {
 			isa = PBXGroup;
 			children = (
+				2B9BC6421C7711BA005407E8 /* Renderer */,
 				2BF4D3A71AF114F000C801B2 /* Assets.xcassets */,
 				2BF4D3A01AF113E600C801B2 /* Camera */,
 				E9D550EC1C05E24700CE72C3 /* Configuration */,
@@ -990,6 +993,14 @@
 				2BFC627B1C720CC2006991D2 /* SeparatorCollectionViewCell.swift */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		2B9BC6421C7711BA005407E8 /* Renderer */ = {
+			isa = PBXGroup;
+			children = (
+				2B9BC6431C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift */,
+			);
+			path = Renderer;
 			sourceTree = "<group>";
 		};
 		2B9F75F01C68A33500E5723B /* Rendering */ = {
@@ -2057,6 +2068,7 @@
 				2BBE166C1C4E44FA00921DE7 /* FocusController.swift in Sources */,
 				2BF4D5011AF1155E00C801B2 /* CelsiusFilter.swift in Sources */,
 				2BF4D3EA1AF1150500C801B2 /* TextEditorViewController.swift in Sources */,
+				2B9BC6441C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift in Sources */,
 				2BF4D50F1AF1155E00C801B2 /* FridgeFilter.swift in Sources */,
 				2BF51F701B41A7E700FFB4C2 /* RecordingMode.swift in Sources */,
 				2B6D88F61C452B9900200557 /* DeviceOrientationController.swift in Sources */,

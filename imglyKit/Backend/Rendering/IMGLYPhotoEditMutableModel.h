@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic) CGFloat contrast;
 @property(nonatomic, copy) NSString *effectFilterIdentifier;
 @property(nonatomic) CGFloat effectFilterIntensity;
+@property(nonatomic) CGPoint focusNormalizedControlPoint1;
+@property(nonatomic) CGPoint focusNormalizedControlPoint2;
+@property(nonatomic) CGFloat focusRadius;
+@property(nonatomic) IMGLYFocusType focusType;
 @property(nonatomic) CGRect normalizedCropRect;
 @property(nonatomic) CGFloat saturation;
 @property(nonatomic) CGFloat straightenAngle;

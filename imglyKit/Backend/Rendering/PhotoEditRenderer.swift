@@ -107,36 +107,67 @@ import CoreImage
         }
 
         // TiltShift
-        // TODO
+        if renderMode.contains(.Focus) {
+            switch photoEditModel.focusType {
+            case .Off:
+                break
+            case .Linear:
+                let linearFocusFilter = LinearFocusFilter()
+                linearFocusFilter.inputImage = editedImage
+                linearFocusFilter.inputNormalizedControlPoint1 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint1)
+                linearFocusFilter.inputNormalizedControlPoint2 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint2)
+                linearFocusFilter.inputRadius = photoEditModel.focusRadius
 
-        // PhotoEffect
-        if let effect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier),
-            filter = effect.newEffectFilter {
-
-            // If this is a `CIColorCube` or `CIColorCubeWithColorSpace` filter, a `lutURL` is set
-            // and no `inputCubeData` was specified, generate new color cube data from the provided
-            // LUT
-            if let lutURL = effect.lutURL, filterName = effect.CIFilterName where (filterName == "CIColorCube" || filterName == "CIColorCubeWithColorSpace") && effect.options?["inputCubeData"] == nil {
-                // Update color cube data if needed
-                if lutConverter.lutURL != lutURL || lutConverter.intensity != Float(photoEditModel.effectFilterIntensity) {
-                    lutConverter.lutURL = effect.lutURL
-                    lutConverter.intensity = Float(photoEditModel.effectFilterIntensity)
-                    colorCubeData = lutConverter.colorCubeData
+                if let outputImage = linearFocusFilter.outputImage {
+                    editedImage = outputImage
                 }
 
-                filter.setValue(colorCubeData, forKey: "inputCubeData")
-            } else {
-                colorCubeData = nil
+                linearFocusFilter.inputImage = nil
+            case .Radial:
+                let radialFocusFilter = RadialFocusFilter()
+                radialFocusFilter.inputImage = editedImage
+                radialFocusFilter.inputNormalizedControlPoint1 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint1)
+                radialFocusFilter.inputNormalizedControlPoint2 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint2)
+                radialFocusFilter.inputRadius = photoEditModel.focusRadius
+
+                if let outputImage = radialFocusFilter.outputImage {
+                    editedImage = outputImage
+                }
+
+                radialFocusFilter.inputImage = nil
             }
+        }
 
-            filter.setValue(editedImage, forKey: kCIInputImageKey)
+        // PhotoEffect
+        if renderMode.contains(.PhotoEffect) {
+            if let effect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier),
+                filter = effect.newEffectFilter {
 
-            if let outputImage = filter.outputImage {
-                editedImage = outputImage
+                    // If this is a `CIColorCube` or `CIColorCubeWithColorSpace` filter, a `lutURL` is set
+                    // and no `inputCubeData` was specified, generate new color cube data from the provided
+                    // LUT
+                    if let lutURL = effect.lutURL, filterName = effect.CIFilterName where (filterName == "CIColorCube" || filterName == "CIColorCubeWithColorSpace") && effect.options?["inputCubeData"] == nil {
+                        // Update color cube data if needed
+                        if lutConverter.lutURL != lutURL || lutConverter.intensity != Float(photoEditModel.effectFilterIntensity) {
+                            lutConverter.lutURL = effect.lutURL
+                            lutConverter.intensity = Float(photoEditModel.effectFilterIntensity)
+                            colorCubeData = lutConverter.colorCubeData
+                        }
+
+                        filter.setValue(colorCubeData, forKey: "inputCubeData")
+                    } else {
+                        colorCubeData = nil
+                    }
+
+                    filter.setValue(editedImage, forKey: kCIInputImageKey)
+
+                    if let outputImage = filter.outputImage {
+                        editedImage = outputImage
+                    }
+
+                    // Free memory
+                    filter.setValue(nil, forKey: kCIInputImageKey)
             }
-
-            // Free memory
-            filter.setValue(nil, forKey: kCIInputImageKey)
         }
 
         // Color Adjustments

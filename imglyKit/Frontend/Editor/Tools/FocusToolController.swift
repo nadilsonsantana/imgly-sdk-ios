@@ -89,8 +89,6 @@ import UIKit
             toolStackItem.discardButton?.addTarget(self, action: "discard:", forControlEvents: .TouchUpInside)
         }
 
-        collectionView.selectItemAtIndexPath(NSIndexPath(forItem: 0, inSection: 0), animated: false, scrollPosition: .None)
-
         let boxGradientView = BoxGradientView()
         boxGradientView.gradientViewDelegate = self
         boxGradientView.hidden = true
@@ -104,6 +102,21 @@ import UIKit
         circleGradientView.alpha = 0
         view.addSubview(circleGradientView)
         self.circleGradientView = circleGradientView
+
+        switch photoEditModel.focusType {
+        case .Off:
+            collectionView.selectItemAtIndexPath(NSIndexPath(forItem: IMGLYFocusType.Off.rawValue, inSection: 0), animated: false, scrollPosition: .None)
+        case .Linear:
+            collectionView.selectItemAtIndexPath(NSIndexPath(forItem: IMGLYFocusType.Linear.rawValue, inSection: 0), animated: false, scrollPosition: .None)
+            boxGradientView.hidden = false
+            boxGradientView.alpha = 1
+            activeFocusType = .Linear
+        case .Radial:
+            collectionView.selectItemAtIndexPath(NSIndexPath(forItem: IMGLYFocusType.Radial.rawValue, inSection: 0), animated: false, scrollPosition: .None)
+            circleGradientView.hidden = false
+            circleGradientView.alpha = 1
+            activeFocusType = .Radial
+        }
 
         view.setNeedsUpdateConstraints()
     }
@@ -149,16 +162,61 @@ import UIKit
         delegate?.photoEditToolController(self, didDiscardChangesInFavorOfPhotoEditModel: uneditedPhotoEditModel)
     }
 
+    // MARK: - Helpers
+
+    private func normalizeControlPoint(point: CGPoint) -> CGPoint {
+        guard let previewView = delegate?.photoEditToolControllerPreviewView(self) else {
+            return point
+        }
+
+        if let boxGradientView = boxGradientView where activeFocusType == .Linear {
+            let convertedPoint = previewView.convertPoint(point, fromView: boxGradientView)
+            return CGPoint(x: convertedPoint.x / previewView.bounds.size.width, y: convertedPoint.y / previewView.bounds.size.height)
+        } else if let circleGradientView = circleGradientView where activeFocusType == .Radial {
+            let convertedPoint = previewView.convertPoint(point, fromView: circleGradientView)
+            return CGPoint(x: convertedPoint.x / previewView.bounds.size.width, y: convertedPoint.y / previewView.bounds.size.height)
+        }
+
+        return point
+    }
+
+    private func denormalizeControlPoint(point: CGPoint) -> CGPoint {
+        guard let previewView = delegate?.photoEditToolControllerPreviewView(self) else {
+            return point
+        }
+
+        if let boxGradientView = boxGradientView where activeFocusType == .Linear {
+            let denormalizedPoint = CGPoint(x: point.x * previewView.bounds.size.width, y: point.y * previewView.bounds.size.height)
+            return previewView.convertPoint(denormalizedPoint, toView: boxGradientView)
+        } else if let circleGradientView = circleGradientView where activeFocusType == .Radial {
+            let denormalizedPoint = CGPoint(x: point.x * previewView.bounds.size.width, y: point.y * previewView.bounds.size.height)
+            return previewView.convertPoint(denormalizedPoint, toView: circleGradientView)
+        }
+
+        return point
+    }
+
+    private func flipNormalizedPointVertically(point: CGPoint) -> CGPoint {
+        return CGPoint(x: point.x, y: 1 - point.y)
+    }
+
 }
 
 extension FocusToolController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         if indexPath.item == IMGLYFocusType.Off.rawValue {
             activeFocusType = .Off
+            photoEditModel.focusType = .Off
         } else if indexPath.item == IMGLYFocusType.Linear.rawValue {
             activeFocusType = .Linear
+            photoEditModel.focusType = .Linear
+            photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(boxGradientView?.controlPoint1 ?? CGPoint.zero))
+            photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(boxGradientView?.controlPoint2 ?? CGPoint.zero))
         } else if indexPath.item == IMGLYFocusType.Radial.rawValue {
             activeFocusType = .Radial
+            photoEditModel.focusType = .Radial
+            photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(circleGradientView?.controlPoint1 ?? CGPoint.zero))
+            photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(circleGradientView?.controlPoint2 ?? CGPoint.zero))
         }
     }
 }
@@ -209,14 +267,19 @@ extension FocusToolController: UICollectionViewDelegateFlowLayout {
 
 extension FocusToolController: GradientViewDelegate {
     public func gradientViewUserInteractionStarted(gradientView: UIView) {
-        // TODO
     }
 
     public func gradientViewUserInteractionEnded(gradientView: UIView) {
-        // TODO
     }
 
     public func gradientViewControlPointChanged(gradientView: UIView) {
-        // TODO
+        if let gradientView = gradientView as? CircleGradientView where gradientView == circleGradientView {
+            photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(gradientView.controlPoint1))
+            photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(gradientView.controlPoint2))
+        } else if let gradientView = gradientView as? BoxGradientView where gradientView == boxGradientView {
+            photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(gradientView.controlPoint1))
+            photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(gradientView.controlPoint2))
+        }
+
     }
 }

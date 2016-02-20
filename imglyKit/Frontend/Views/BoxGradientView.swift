@@ -37,20 +37,6 @@ public struct Line {
         }
     }
 
-    /// The normalized first control point.
-    public var normalizedControlPoint1: CGPoint {
-        get {
-            return CGPoint(x: controlPoint1.x / frame.size.width, y: controlPoint1.y / frame.size.height)
-        }
-    }
-
-    /// The normalized second control point.
-    public var normalizedControlPoint2: CGPoint {
-        get {
-            return CGPoint(x: controlPoint2.x / frame.size.width, y: controlPoint2.y / frame.size.height)
-        }
-    }
-
     private var setup = false
 
     // MARK: - setup

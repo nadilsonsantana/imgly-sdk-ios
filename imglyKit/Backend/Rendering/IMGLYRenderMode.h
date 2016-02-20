@@ -10,9 +10,9 @@ typedef NS_OPTIONS(NSUInteger, IMGLYRenderMode) {
     IMGLYRenderModeNone = 0,
     IMGLYRenderModeAutoEnhancement = 1 << 0,
     IMGLYRenderModeOrientationCrop = 1 << 1,
-    IMGLYRenderModeTiltShift = 1 << 2,
-    IMGLYRenderModeEffectFilter = 1 << 3,
+    IMGLYRenderModeFocus = 1 << 2,
+    IMGLYRenderModePhotoEffect = 1 << 3,
     IMGLYRenderModeColorAdjustments = 1 << 4,
-    IMGLYRenderModeAll = IMGLYRenderModeAutoEnhancement | IMGLYRenderModeOrientationCrop | IMGLYRenderModeTiltShift |
-                         IMGLYRenderModeEffectFilter | IMGLYRenderModeColorAdjustments
+    IMGLYRenderModeAll = IMGLYRenderModeAutoEnhancement | IMGLYRenderModeOrientationCrop | IMGLYRenderModeFocus |
+                         IMGLYRenderModePhotoEffect | IMGLYRenderModeColorAdjustments
 };

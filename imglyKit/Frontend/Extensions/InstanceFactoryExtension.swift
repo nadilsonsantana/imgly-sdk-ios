@@ -26,8 +26,6 @@ extension InstanceFactory {
             return stickersEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Orientation:
             return orientationEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
-        case .Focus:
-            return focusEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Crop:
             return cropEditorViewControllerWithFixedFilterStack(fixedFilterStack, configuration: configuration)
         case .Text:
@@ -83,15 +81,6 @@ extension InstanceFactory {
     public class func orientationEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> OrientationEditorViewController {
         // swiftlint:disable force_cast
         let vc = configuration.getClassForReplacedClass(OrientationEditorViewController.self).init() as! OrientationEditorViewController
-        // swiftlint:enable force_cast
-        vc.configuration = configuration
-        vc.fixedFilterStack = fixedFilterStack
-        return vc
-    }
-
-    public class func focusEditorViewControllerWithFixedFilterStack(fixedFilterStack: FixedFilterStack, configuration: Configuration) -> FocusEditorViewController {
-        // swiftlint:disable force_cast
-        let vc = configuration.getClassForReplacedClass(FocusEditorViewController.self).init() as! FocusEditorViewController
         // swiftlint:enable force_cast
         vc.configuration = configuration
         vc.fixedFilterStack = fixedFilterStack

@@ -25,6 +25,10 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
 @dynamic contrast;
 @dynamic effectFilterIdentifier;
 @dynamic effectFilterIntensity;
+@dynamic focusNormalizedControlPoint1;
+@dynamic focusNormalizedControlPoint2;
+@dynamic focusRadius;
+@dynamic focusType;
 @dynamic normalizedCropRect;
 @dynamic saturation;
 @dynamic straightenAngle;
@@ -97,6 +101,38 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
     if (_effectFilterIntensity != effectFilterIntensity) {
         [self performChangesWithBlock:^{
           _effectFilterIntensity = effectFilterIntensity;
+        }];
+    }
+}
+
+- (void)setFocusNormalizedControlPoint1:(CGPoint)focusNormalizedControlPoint1 {
+    if (!CGPointEqualToPoint(_focusNormalizedControlPoint1, focusNormalizedControlPoint1)) {
+        [self performChangesWithBlock:^{
+          _focusNormalizedControlPoint1 = focusNormalizedControlPoint1;
+        }];
+    }
+}
+
+- (void)setFocusNormalizedControlPoint2:(CGPoint)focusNormalizedControlPoint2 {
+    if (!CGPointEqualToPoint(_focusNormalizedControlPoint2, focusNormalizedControlPoint2)) {
+        [self performChangesWithBlock:^{
+          _focusNormalizedControlPoint2 = focusNormalizedControlPoint2;
+        }];
+    }
+}
+
+- (void)setFocusRadius:(CGFloat)focusRadius {
+    if (_focusRadius != focusRadius) {
+        [self performChangesWithBlock:^{
+          _focusRadius = focusRadius;
+        }];
+    }
+}
+
+- (void)setFocusType:(IMGLYFocusType)focusType {
+    if (_focusType != focusType) {
+        [self performChangesWithBlock:^{
+          _focusType = focusType;
         }];
     }
 }

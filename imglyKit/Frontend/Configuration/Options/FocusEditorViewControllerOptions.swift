@@ -10,10 +10,10 @@ import UIKit
 
 /// This closure allows the configuration of the given `ImageCaptionButton`,
 /// depending on the linked focus action.
-public typealias FocusActionButtonConfigurationClosure = (ImageCaptionButton, FocusAction) -> ()
+public typealias FocusActionButtonConfigurationClosure = (ImageCaptionButton, IMGLYFocusType) -> ()
 
 /// This closure is called when the user selects a focus action.
-public typealias FocusActionSelectedClosure = (FocusAction) -> ()
+public typealias FocusActionSelectedClosure = (IMGLYFocusType) -> ()
 
 /// This closure is called when the user selects a focus action.
 public typealias FocusPositionChanged = () -> ()
@@ -25,7 +25,7 @@ public typealias FocusPositionChanged = () -> ()
     /// Defines all allowed focus actions. The focus buttons are shown in the given order.
     /// Defaults to show all available modes. The .Off action is always added. To set this
     /// property from Obj-C, see the `allowedFocusActionsAsNSNumbers` property.
-    public let allowedFocusActions: [FocusAction]
+    public let allowedFocusActions: [IMGLYFocusType]
 
     /// This closure allows further configuration of the action buttons. The closure is called for
     /// each action button and has the button and its corresponding action as parameters.
@@ -68,7 +68,7 @@ The default `FocusEditorViewControllerOptionsBuilder` for `FocusEditorViewContro
     /// Defines all allowed focus actions. The focus buttons are shown in the given order.
     /// Defaults to show all available modes. The .Off action is always added. To set this
     /// property from Obj-C, see the `allowedFocusActionsAsNSNumbers` property.
-    public var allowedFocusActions: [FocusAction] = [ .Off, .Linear, .Radial ] {
+    public var allowedFocusActions: [IMGLYFocusType] = [ .Off, .Linear, .Radial ] {
         didSet {
             if !allowedFocusActions.contains(.Off) {
                 allowedFocusActions.append(.Off)
@@ -92,7 +92,7 @@ The default `FocusEditorViewControllerOptionsBuilder` for `FocusEditorViewContro
         }
 
         set {
-            allowedFocusActions = newValue.flatMap { FocusAction(rawValue: $0.integerValue) }
+            allowedFocusActions = newValue.flatMap { IMGLYFocusType(rawValue: $0.integerValue) }
         }
     }
 

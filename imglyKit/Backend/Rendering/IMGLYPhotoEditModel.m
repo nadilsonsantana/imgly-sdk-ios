@@ -22,6 +22,10 @@
         _contrast = 1;
         _effectFilterIdentifier = @"None";
         _effectFilterIntensity = 0.75;
+        _focusNormalizedControlPoint1 = CGPointZero;
+        _focusNormalizedControlPoint2 = CGPointZero;
+        _focusRadius = 4;
+        _focusType = IMGLYFocusTypeOff;
         _normalizedCropRect = [[self class] identityNormalizedCropRect];
         _saturation = 1;
         _straightenAngle = 0;
@@ -49,6 +53,10 @@
     _contrast = photoEditModel.contrast;
     _effectFilterIdentifier = photoEditModel.effectFilterIdentifier.copy;
     _effectFilterIntensity = photoEditModel.effectFilterIntensity;
+    _focusNormalizedControlPoint1 = photoEditModel.focusNormalizedControlPoint1;
+    _focusNormalizedControlPoint2 = photoEditModel.focusNormalizedControlPoint2;
+    _focusRadius = photoEditModel.focusRadius;
+    _focusType = photoEditModel.focusType;
     _normalizedCropRect = photoEditModel.normalizedCropRect;
     _saturation = photoEditModel.saturation;
     _straightenAngle = photoEditModel.straightenAngle;
@@ -97,6 +105,22 @@
     }
 
     if (photoEditModel.effectFilterIntensity != self.effectFilterIntensity) {
+        return NO;
+    }
+
+    if (!CGPointEqualToPoint(photoEditModel.focusNormalizedControlPoint1, self.focusNormalizedControlPoint1)) {
+        return NO;
+    }
+
+    if (!CGPointEqualToPoint(photoEditModel.focusNormalizedControlPoint2, self.focusNormalizedControlPoint2)) {
+        return NO;
+    }
+
+    if (photoEditModel.focusRadius != self.focusRadius) {
+        return NO;
+    }
+
+    if (photoEditModel.focusType != self.focusType) {
         return NO;
     }
 

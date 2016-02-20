@@ -710,6 +710,10 @@ extension PhotoEditViewController: PhotoEditToolControllerDelegate {
         return baseWorkUIImage
     }
 
+    public func photoEditToolControllerPreviewView(photoEditToolController: PhotoEditToolController) -> UIView? {
+        return mainPreviewView
+    }
+
     public func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController) {
         delegate?.photoEditViewControllerPopToolController(self)
     }

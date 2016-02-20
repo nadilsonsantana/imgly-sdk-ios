@@ -9,17 +9,7 @@
 @import Foundation;
 @import CoreGraphics;
 
-typedef NS_ENUM(NSInteger, IMGLYOrientation) {
-    IMGLYOrientationUnknown,
-    IMGLYOrientationNormal,
-    IMGLYOrientationFlipX,
-    IMGLYOrientationRotate180,
-    IMGLYOrientationFlipY,
-    IMGLYOrientationTranspose,
-    IMGLYOrientationRotate90,
-    IMGLYOrientationTransverse,
-    IMGLYOrientationRotate270
-};
+#import "Enums.h"
 
 @interface IMGLYPhotoEditModel : NSObject <NSCopying> {
   @protected
@@ -29,6 +19,10 @@ typedef NS_ENUM(NSInteger, IMGLYOrientation) {
     CGFloat _contrast;
     NSString *_effectFilterIdentifier;
     CGFloat _effectFilterIntensity;
+    CGPoint _focusNormalizedControlPoint1;
+    CGPoint _focusNormalizedControlPoint2;
+    CGFloat _focusRadius;
+    IMGLYFocusType _focusType;
     CGRect _normalizedCropRect;
     CGFloat _saturation;
     CGFloat _straightenAngle;
@@ -65,6 +59,26 @@ NS_ASSUME_NONNULL_BEGIN
  *  The intensity of the effect filter.
  */
 @property(nonatomic, readonly) CGFloat effectFilterIntensity;
+
+/**
+ *  The first normalized control point of the focus. This control point should use the coordinate system of Core Image, which means that (0,0) is at the top left.
+ */
+@property(nonatomic, readonly) CGPoint focusNormalizedControlPoint1;
+
+/**
+ *  The second normalized control point of the focus. This control point should use the coordinate system of Core Image, which means that (0,0) is at the top left.
+ */
+@property(nonatomic, readonly) CGPoint focusNormalizedControlPoint2;
+
+/**
+ *  The blur radius to use for focus. Default is 4.
+ */
+@property(nonatomic, readonly) CGFloat focusRadius;
+
+/**
+ *  The `IMGLYFocusType` to apply to the image.
+ */
+@property(nonatomic, readonly) IMGLYFocusType focusType;
 
 /**
  *  The normalized crop rect of the image.

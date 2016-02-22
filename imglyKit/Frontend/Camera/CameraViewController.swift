@@ -918,6 +918,7 @@ public typealias CameraCompletionBlock = (UIImage?, NSURL?) -> (Void)
         }
 
         let toolStackController = ToolStackController(photoEditViewController: photoEditViewController)
+        toolStackController.delegate = self
         self.presentViewController(toolStackController, animated: true, completion: nil)
     }
 
@@ -1469,5 +1470,16 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
      */
     public func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         self.dismissViewControllerAnimated(true, completion: nil)
+    }
+}
+
+extension CameraViewController: ToolStackControllerDelegate {
+    public func toolStackController(toolStackController: ToolStackController, didFinishWithImage image: UIImage) {
+        // TODO
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+
+    public func toolStackControllerDidCancel(toolStackController: ToolStackController) {
+        dismissViewControllerAnimated(true, completion: nil)
     }
 }

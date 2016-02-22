@@ -8,6 +8,11 @@
 
 import UIKit
 
+@objc(IMGLYToolStackControllerDelegate) public protocol ToolStackControllerDelegate {
+    func toolStackController(toolStackController: ToolStackController, didFinishWithImage image: UIImage)
+    func toolStackControllerDidCancel(toolStackController: ToolStackController)
+}
+
 /**
  *  An instance of `ToolStackController` manages the presentation and dismissal of `PhotoEditToolController` instances
  *  onto an instance of a `PhotoEditViewController`.
@@ -22,6 +27,8 @@ import UIKit
     // MARK: - Properties
 
     private let configuration: Configuration
+
+    public weak var delegate: ToolStackControllerDelegate?
 
     /// The `PhotoEditViewController` that acts as the root view controller.
     public let photoEditViewController: PhotoEditViewController
@@ -354,6 +361,7 @@ import UIKit
         topChildViewController.beginAppearanceTransition(false, animated: animated)
 
         // Add child view controller, forward appearance methods and add views
+        toolController.willBecomeActiveTool()
         toolControllers.append(toolController)
         addChildViewController(toolController)
         toolController.beginAppearanceTransition(true, animated: animated)
@@ -401,6 +409,7 @@ import UIKit
             topChildViewController.endAppearanceTransition()
             self.photoEditViewController.updateLastKnownImageSize()
             self.photoEditViewController.updateRenderedPreviewForceRender(false)
+            toolController.didBecomeActiveTool()
         }
 
         if animated {
@@ -462,6 +471,7 @@ import UIKit
         topChildViewController.beginAppearanceTransition(true, animated: animated)
 
         // Tell tool controller that will be popped that it is about to disappear
+        toolController.willResignActiveTool()
         toolController.willMoveToParentViewController(nil)
         toolController.beginAppearanceTransition(false, animated: animated)
 
@@ -479,6 +489,7 @@ import UIKit
             topChildViewController.endAppearanceTransition()
             self.photoEditViewController.updateLastKnownImageSize()
             self.photoEditViewController.updateRenderedPreviewForceRender(false)
+            toolController.didResignActiveTool()
         }
 
         if animated {
@@ -520,5 +531,13 @@ extension ToolStackController: PhotoEditViewControllerDelegate {
 
     public func photoEditViewControllerCurrentEditingTool(photoEditViewController: PhotoEditViewController) -> PhotoEditToolController? {
         return toolControllers.last
+    }
+
+    public func photoEditViewController(photoEditViewController: PhotoEditViewController, didSaveImage image: UIImage) {
+        delegate?.toolStackController(self, didFinishWithImage: image)
+    }
+
+    public func photoEditViewControllerDidCancel(photoEditviewController: PhotoEditViewController) {
+        delegate?.toolStackControllerDidCancel(self)
     }
 }

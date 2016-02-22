@@ -27,7 +27,7 @@ import UIKit
     public var preferredRenderMode: IMGLYRenderMode
 
     let photoEditModel: IMGLYPhotoEditMutableModel
-    let uneditedPhotoEditModel: IMGLYPhotoEditModel
+    @NSCopying internal var uneditedPhotoEditModel: IMGLYPhotoEditModel
     private let configuration: Configuration
 
     weak var delegate: PhotoEditToolControllerDelegate?
@@ -67,6 +67,24 @@ import UIKit
     /**
      :nodoc:
      */
+    public override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "photoEditModelDidChange:", name: IMGLYPhotoEditModelDidChangeNotification, object: photoEditModel)
+    }
+
+    /**
+    :nodoc:
+    */
+    public override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: IMGLYPhotoEditModelDidChangeNotification, object: photoEditModel)
+    }
+
+    /**
+     :nodoc:
+     */
     public override func updateViewConstraints() {
         super.updateViewConstraints()
     }
@@ -99,5 +117,55 @@ import UIKit
 
     /// The tool stack configuration item.
     public private(set) lazy var toolStackItem = ToolStackItem()
+
+    /**
+     Called when any property of the photo edit model changes.
+
+     - parameter notification: The notification that was sent.
+     */
+    public func photoEditModelDidChange(notification: NSNotification) {
+
+    }
+
+    /**
+     Notifies the tool controller that it is about to become the active tool.
+
+     **Discussion:** If you override this method, you must call `super` at some point in your implementation.
+     */
+    public func willBecomeActiveTool() {
+        if uneditedPhotoEditModel != photoEditModel {
+            uneditedPhotoEditModel = photoEditModel
+        }
+    }
+
+    /**
+     Notifies the tool controller that it became the active tool.
+
+     **Discussion:** If you override this method, you must call `super` at some point in your implementation.
+     */
+    public func didBecomeActiveTool() {
+
+    }
+
+    /**
+     Notifies the tool controller that it is about to resign being the active tool.
+
+     **Discussion:** This method will **not** be called if another tool is pushed above this tool.
+     It is only called if you pop the tool from the tool stack controller. If you override this method,
+     you must call `super` at some point in your implementation.
+     */
+    public func willResignActiveTool() {
+    }
+
+    /**
+     Notifies the tool controller that it resigned being the active tool.
+
+     **Discussion:** This method will **not** be called if another tool is pushed above this tool.
+     It is only called if you pop the tool from the tool stack controller. If you override this method,
+     you must call `super` at some point in your implementation.
+     */
+    public func didResignActiveTool() {
+
+    }
 
 }

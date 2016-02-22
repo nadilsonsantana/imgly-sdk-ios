@@ -46,6 +46,7 @@ class SampleViewController: UIViewController {
         let sampleImage = UIImage(named: "sample_image")
         let photoEditViewController = PhotoEditViewController(photo: sampleImage!)
         let toolStackController = ToolStackController(photoEditViewController: photoEditViewController)
+        toolStackController.delegate = self
 
         presentViewController(toolStackController, animated: true, completion: nil)
     }
@@ -202,4 +203,14 @@ class SampleViewController: UIViewController {
         }
     }
     // swiftlint:enable cyclomatic_complexity
+}
+
+extension SampleViewController: ToolStackControllerDelegate {
+    func toolStackController(toolStackController: ToolStackController, didFinishWithImage image: UIImage) {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+
+    func toolStackControllerDidCancel(toolStackController: ToolStackController) {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
 }

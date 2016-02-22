@@ -42,6 +42,7 @@ import UIKit
                     UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
                         self.circleGradientView?.alpha = 0
                         self.boxGradientView?.alpha = 0
+                        self.sliderContainerView?.alpha = 0
                         }) { _ in
                             self.circleGradientView?.hidden = true
                             self.boxGradientView?.hidden = true
@@ -52,6 +53,7 @@ import UIKit
                     UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
                         self.circleGradientView?.alpha = 0
                         self.boxGradientView?.alpha = 1
+                        self.sliderContainerView?.alpha = 1
                         }) { _ in
                             self.circleGradientView?.hidden = true
                     }
@@ -61,6 +63,7 @@ import UIKit
                     UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
                         self.circleGradientView?.alpha = 1
                         self.boxGradientView?.alpha = 0
+                        self.sliderContainerView?.alpha = 1
                         }) { _ in
                             self.boxGradientView?.hidden = true
                     }
@@ -76,6 +79,8 @@ import UIKit
 
     private var sliderConstraints: [NSLayoutConstraint]?
     private var gradientViewConstraints: [NSLayoutConstraint]?
+
+    private var didPerformInitialGradientViewLayout = false
 
     // MARK: - UIViewController
 
@@ -185,8 +190,21 @@ import UIKit
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        boxGradientView?.centerGUIElements()
-        circleGradientView?.centerGUIElements()
+        if !didPerformInitialGradientViewLayout {
+            boxGradientView?.centerGUIElements()
+            circleGradientView?.centerGUIElements()
+            didPerformInitialGradientViewLayout = true
+        }
+    }
+
+    // MARK: - PhotoEditToolController
+
+    public override func photoEditModelDidChange(notification: NSNotification) {
+        super.photoEditModelDidChange(notification)
+
+        activeFocusType = photoEditModel.focusType
+        slider?.setValue(Float(photoEditModel.focusBlurRadius), animated: true)
+        collectionView.selectItemAtIndexPath(NSIndexPath(forItem: activeFocusType.rawValue, inSection: 0), animated: true, scrollPosition: .None)
     }
 
     // MARK: - Actions
@@ -247,31 +265,22 @@ import UIKit
 
 extension FocusToolController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.item == IMGLYFocusType.Off.rawValue {
-            activeFocusType = .Off
-            photoEditModel.focusType = .Off
+        guard let focusType = IMGLYFocusType(rawValue: indexPath.item) else {
+            return
+        }
 
-            UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
-                self.sliderContainerView?.alpha = 0
-                }, completion: nil)
-        } else if indexPath.item == IMGLYFocusType.Linear.rawValue {
-            activeFocusType = .Linear
-            photoEditModel.focusType = .Linear
+        activeFocusType = focusType
+        photoEditModel.focusType = focusType
+
+        switch focusType {
+        case .Off:
+            break
+        case .Linear:
             photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(boxGradientView?.controlPoint1 ?? CGPoint.zero))
             photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(boxGradientView?.controlPoint2 ?? CGPoint.zero))
-
-            UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
-                self.sliderContainerView?.alpha = 1
-                }, completion: nil)
-        } else if indexPath.item == IMGLYFocusType.Radial.rawValue {
-            activeFocusType = .Radial
-            photoEditModel.focusType = .Radial
+        case.Radial:
             photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(circleGradientView?.controlPoint1 ?? CGPoint.zero))
             photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(circleGradientView?.controlPoint2 ?? CGPoint.zero))
-
-            UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
-                self.sliderContainerView?.alpha = 1
-                }, completion: nil)
         }
     }
 }

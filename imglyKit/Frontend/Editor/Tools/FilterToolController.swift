@@ -18,6 +18,7 @@ import UIKit
     private var slider: UISlider?
 
     private var sliderConstraints: [NSLayoutConstraint]?
+    private var didPerformInitialScrollToReveal = false
 
     // MARK: - UIViewController
 
@@ -89,14 +90,15 @@ import UIKit
         view.setNeedsUpdateConstraints()
     }
 
-    /*
+    /**
     :nodoc:
     */
     public override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
 
-        if let photoEffect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier), index = PhotoEffect.allEffects.indexOf(photoEffect) {
+        if let photoEffect = PhotoEffect.effectWithIdentifier(photoEditModel.effectFilterIdentifier), index = PhotoEffect.allEffects.indexOf(photoEffect) where !didPerformInitialScrollToReveal {
             filterSelectionController?.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0), atScrollPosition: .CenteredHorizontally, animated: animated)
+            didPerformInitialScrollToReveal = true
         }
     }
 
@@ -117,6 +119,23 @@ import UIKit
 
             NSLayoutConstraint.activateConstraints(constraints)
             sliderConstraints = constraints
+        }
+    }
+
+    // MARK: - PhotoEditToolController
+
+    /**
+    :nodoc:
+    */
+    public override func photoEditModelDidChange(notification: NSNotification) {
+        super.photoEditModelDidChange(notification)
+
+        if let selectedIndexPath = filterSelectionController?.collectionView.indexPathsForSelectedItems()?.first {
+            if photoEditModel.effectFilterIdentifier != PhotoEffect.allEffects[selectedIndexPath.item].identifier {
+                filterSelectionController?.updateSelectionAnimated(true)
+            }
+        } else {
+            filterSelectionController?.updateSelectionAnimated(true)
         }
     }
 

@@ -70,6 +70,17 @@ public typealias PhotoEffectActiveBlock = () -> (PhotoEffect?)
         }
     }
 
+    /**
+     Updates the cell selection based on the `activePhotoEffectBlock`.
+
+     - parameter animated: If `true` the selection will be animated.
+     */
+    public func updateSelectionAnimated(animated: Bool) {
+        if let photoEffect = activePhotoEffectBlock?(), index = PhotoEffect.allEffects.indexOf(photoEffect) {
+            collectionView.selectItemAtIndexPath(NSIndexPath(forItem: index, inSection: 0), animated: animated, scrollPosition: .None)
+        }
+    }
+
 }
 
 extension FilterSelectionController: UICollectionViewDataSource {

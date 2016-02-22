@@ -13,6 +13,8 @@ import GLKit
     func photoEditViewController(photoEditViewController: PhotoEditViewController, didSelectToolController toolController: PhotoEditToolController)
     func photoEditViewControllerPopToolController(photoEditViewController: PhotoEditViewController)
     func photoEditViewControllerCurrentEditingTool(photoEditViewController: PhotoEditViewController) -> PhotoEditToolController?
+    func photoEditViewController(photoEditViewController: PhotoEditViewController, didSaveImage image: UIImage)
+    func photoEditViewControllerDidCancel(photoEditviewController: PhotoEditViewController)
 }
 
 @objc(IMGLYPhotoEditViewController) public class PhotoEditViewController: UIViewController {
@@ -48,6 +50,8 @@ import GLKit
         }
     }
 
+    private var photoFileURL: NSURL?
+
     private let configuration: Configuration
 
     private var photoEditModel: IMGLYPhotoEditMutableModel? {
@@ -82,8 +86,14 @@ import GLKit
             updateMainRenderer()
 
             if baseWorkUIImage != nil {
-                // TODO: Save to disc
-                photo = nil
+                if let photo = photo {
+                    // Write full resolution image to disc to free memory
+                    let fileName = "\(NSProcessInfo.processInfo().globallyUniqueString)_photo.png"
+                    let fileURL = NSURL(fileURLWithPath: (NSTemporaryDirectory() as NSString).stringByAppendingPathComponent(fileName))
+                    UIImagePNGRepresentation(photo)?.writeToURL(fileURL, atomically: true)
+                    photoFileURL = fileURL
+                    self.photo = nil
+                }
             }
         }
         }
@@ -109,6 +119,8 @@ import GLKit
     /// The intensity of the photo effect that is applied to the photo immediately. See
     /// `initialPhotoEffectIdentifier` for more information.
     public var initialPhotoEffectIntensity: Float?
+
+    private var toolForAction: [MainEditorActionType: PhotoEditToolController]?
 
     // MARK: - Other Properties
 
@@ -192,6 +204,7 @@ import GLKit
         super.viewWillAppear(animated)
 
         loadPhotoEditModelIfNecessary()
+        loadToolsIfNeeded()
         updateToolStackItem()
         updateBackgroundColor()
         updatePlaceholderImage()
@@ -300,8 +313,8 @@ import GLKit
 
         toolStackItem.performChanges {
             toolStackItem.mainToolbarView = collectionView
-            toolStackItem.discardButton = nil
-            toolStackItem.applyButton = nil
+            toolStackItem.applyButton?.addTarget(self, action: "save:", forControlEvents: .TouchUpInside)
+            toolStackItem.discardButton?.addTarget(self, action: "cancel:", forControlEvents: .TouchUpInside)
             toolStackItem.titleLabel?.text = Localize("EDITOR")
         }
     }
@@ -486,8 +499,11 @@ import GLKit
     }
 
     private func orientedCIImageFromUIImage(image: UIImage) -> CIImage {
-        // TODO: Fix force unwrap
-        var ciImage = CIImage(CGImage: image.CGImage!)
+        guard let cgImage = image.CGImage else {
+            return CIImage.emptyImage()
+        }
+
+        var ciImage = CIImage(CGImage: cgImage)
         ciImage = ciImage.imageByApplyingOrientation(Int32(image.imageOrientation.rawValue))
         return ciImage
     }
@@ -500,6 +516,61 @@ import GLKit
         let scale = min(targetSize.width / size.width, targetSize.height / size.height)
 
         return size * scale
+    }
+
+    // MARK: - Tools
+
+    private func loadToolsIfNeeded() {
+        if toolForAction == nil {
+            var toolForAction = [MainEditorActionType: PhotoEditToolController]()
+
+            for i in 0 ..< options.editorActionsDataSource.actionCount {
+                let action = options.editorActionsDataSource.actionAtIndex(i)
+
+                if let photoEditModel = photoEditModel, toolController = InstanceFactory.toolControllerForEditorActionType(action.editorType, withPhotoEditModel: photoEditModel, configuration: configuration) {
+                    toolController.delegate = self
+                    toolForAction[action.editorType] = toolController
+                }
+            }
+
+            self.toolForAction = toolForAction
+        }
+    }
+
+    // MARK: - Actions
+
+    @objc private func save(sender: UIButton) {
+        // Load photo from disc
+        if let photoFileURL = photoFileURL, path = photoFileURL.path, photo = UIImage(contentsOfFile: path) {
+            if photoEditModel == uneditedPhotoEditModel {
+                delegate?.photoEditViewController(self, didSaveImage: photo)
+            } else if let cgImage = photo.CGImage {
+                let ciImage = CIImage(CGImage: cgImage)
+                let photoEditRenderer = PhotoEditRenderer()
+                photoEditRenderer.photoEditModel = photoEditModel
+                photoEditRenderer.originalImage = ciImage
+
+                photoEditRenderer.createOutputImageWithCompletion { outputImage in
+                    let image = UIImage(CGImage: outputImage)
+
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.delegate?.photoEditViewController(self, didSaveImage: image)
+
+                        // Remove temporary file from disc
+                        _ = try? NSFileManager.defaultManager().removeItemAtURL(photoFileURL)
+                    }
+                }
+            }
+        }
+    }
+
+    @objc private func cancel(sender: UIButton) {
+        if let photoFileURL = photoFileURL {
+            // Remove temporary file from disc
+            _ = try? NSFileManager.defaultManager().removeItemAtURL(photoFileURL)
+        }
+
+        delegate?.photoEditViewControllerDidCancel(self)
     }
 }
 
@@ -566,8 +637,6 @@ extension PhotoEditViewController: UIScrollViewDelegate {
             mainPreviewView?.frame = CGRect(x: 0, y: 0, width: fittedSize.width, height: fittedSize.height)
             previewViewScrollingContainer.contentSize = fittedSize
             previewViewScrollingContainer.zoomScale = zoomScale
-
-            // currentEditingTool?.resetForZoomAndPan()
         }
 
         updateScrollViewCentering()
@@ -674,8 +743,7 @@ extension PhotoEditViewController: UICollectionViewDelegate, UICollectionViewDel
                 photoEditModel.autoEnhancementEnabled = !photoEditModel.autoEnhancementEnabled
             }
         } else {
-            if let photoEditModel = photoEditModel, toolController = InstanceFactory.toolControllerForEditorActionType(action.editorType, withPhotoEditModel: photoEditModel, configuration: configuration) {
-                toolController.delegate = self
+            if let toolController = toolForAction?[action.editorType] {
                 delegate?.photoEditViewController(self, didSelectToolController: toolController)
             }
         }

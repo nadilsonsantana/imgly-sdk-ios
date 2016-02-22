@@ -137,6 +137,26 @@ import UIKit
         }
     }
 
+    // MARK: - PhotoEditToolController
+
+    /**
+    :nodoc:
+    */
+    public override func photoEditModelDidChange(notification: NSNotification) {
+        super.photoEditModelDidChange(notification)
+
+        if let activeAdjustTool = activeAdjustTool {
+            switch activeAdjustTool {
+            case .Brightness:
+                slider?.setValue(Float(photoEditModel.brightness), animated: true)
+            case .Contrast:
+                slider?.setValue(Float(photoEditModel.contrast), animated: true)
+            case .Saturation:
+                slider?.setValue(Float(photoEditModel.saturation), animated: true)
+            }
+        }
+    }
+
     // MARK: - Actions
 
     @objc private func apply(sender: UIButton) {

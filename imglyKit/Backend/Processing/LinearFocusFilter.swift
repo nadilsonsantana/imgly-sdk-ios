@@ -35,7 +35,7 @@ import UIKit
     public override func setDefaults() {
         inputNormalizedControlPoint1 = NSValue(CGPoint: CGPoint.zero)
         inputNormalizedControlPoint2 = NSValue(CGPoint: CGPoint.zero)
-        inputRadius = 4
+        inputRadius = 10
     }
 
     /// :nodoc:
@@ -66,7 +66,6 @@ import UIKit
 
         let controlPoint1Extension = denormalizedControlPoint1 - 0.3 * vector
         let controlPoint2Extension = denormalizedControlPoint2 + 0.3 * vector
-
 
         guard let gradient0 = CIFilter(name: "CILinearGradient", withInputParameters: ["inputPoint0": CIVector(CGPoint: controlPoint1Extension), "inputPoint1": CIVector(CGPoint: denormalizedControlPoint1), "inputColor0": opaqueColor, "inputColor1": transparentColor])?.outputImage else {
             return inputImage

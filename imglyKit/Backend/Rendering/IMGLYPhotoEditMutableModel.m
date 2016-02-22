@@ -27,7 +27,7 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
 @dynamic effectFilterIntensity;
 @dynamic focusNormalizedControlPoint1;
 @dynamic focusNormalizedControlPoint2;
-@dynamic focusRadius;
+@dynamic focusBlurRadius;
 @dynamic focusType;
 @dynamic normalizedCropRect;
 @dynamic saturation;
@@ -121,10 +121,10 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
     }
 }
 
-- (void)setFocusRadius:(CGFloat)focusRadius {
-    if (_focusRadius != focusRadius) {
+- (void)setFocusBlurRadius:(CGFloat)focusBlurRadius {
+    if (_focusBlurRadius != focusBlurRadius) {
         [self performChangesWithBlock:^{
-          _focusRadius = focusRadius;
+          _focusBlurRadius = focusBlurRadius;
         }];
     }
 }

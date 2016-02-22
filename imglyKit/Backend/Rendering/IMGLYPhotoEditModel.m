@@ -24,7 +24,7 @@
         _effectFilterIntensity = 0.75;
         _focusNormalizedControlPoint1 = CGPointZero;
         _focusNormalizedControlPoint2 = CGPointZero;
-        _focusRadius = 4;
+        _focusBlurRadius = 10;
         _focusType = IMGLYFocusTypeOff;
         _normalizedCropRect = [[self class] identityNormalizedCropRect];
         _saturation = 1;
@@ -55,7 +55,7 @@
     _effectFilterIntensity = photoEditModel.effectFilterIntensity;
     _focusNormalizedControlPoint1 = photoEditModel.focusNormalizedControlPoint1;
     _focusNormalizedControlPoint2 = photoEditModel.focusNormalizedControlPoint2;
-    _focusRadius = photoEditModel.focusRadius;
+    _focusBlurRadius = photoEditModel.focusBlurRadius;
     _focusType = photoEditModel.focusType;
     _normalizedCropRect = photoEditModel.normalizedCropRect;
     _saturation = photoEditModel.saturation;
@@ -116,7 +116,7 @@
         return NO;
     }
 
-    if (photoEditModel.focusRadius != self.focusRadius) {
+    if (photoEditModel.focusBlurRadius != self.focusBlurRadius) {
         return NO;
     }
 

@@ -21,7 +21,7 @@
     CGFloat _effectFilterIntensity;
     CGPoint _focusNormalizedControlPoint1;
     CGPoint _focusNormalizedControlPoint2;
-    CGFloat _focusRadius;
+    CGFloat _focusBlurRadius;
     IMGLYFocusType _focusType;
     CGRect _normalizedCropRect;
     CGFloat _saturation;
@@ -61,19 +61,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) CGFloat effectFilterIntensity;
 
 /**
- *  The first normalized control point of the focus. This control point should use the coordinate system of Core Image, which means that (0,0) is at the top left.
+ *  The first normalized control point of the focus. This control point should use the coordinate system of Core Image,
+ * which means that (0,0) is at the top left.
  */
 @property(nonatomic, readonly) CGPoint focusNormalizedControlPoint1;
 
 /**
- *  The second normalized control point of the focus. This control point should use the coordinate system of Core Image, which means that (0,0) is at the top left.
+ *  The second normalized control point of the focus. This control point should use the coordinate system of Core Image,
+ * which means that (0,0) is at the top left.
  */
 @property(nonatomic, readonly) CGPoint focusNormalizedControlPoint2;
 
 /**
- *  The blur radius to use for focus. Default is 4.
+ *  The blur radius to use for focus. Default is 10.
  */
-@property(nonatomic, readonly) CGFloat focusRadius;
+@property(nonatomic, readonly) CGFloat focusBlurRadius;
 
 /**
  *  The `IMGLYFocusType` to apply to the image.

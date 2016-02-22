@@ -71,7 +71,10 @@ import UIKit
 
     private var boxGradientView: BoxGradientView?
     private var circleGradientView: CircleGradientView?
+    private var sliderContainerView: UIView?
+    private var slider: UISlider?
 
+    private var sliderConstraints: [NSLayoutConstraint]?
     private var gradientViewConstraints: [NSLayoutConstraint]?
 
     // MARK: - UIViewController
@@ -118,6 +121,24 @@ import UIKit
             activeFocusType = .Radial
         }
 
+        let sliderContainerView = UIView()
+        sliderContainerView.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.8)
+        sliderContainerView.translatesAutoresizingMaskIntoConstraints = false
+        sliderContainerView.alpha = photoEditModel.focusType == .Off ? 0 : 1
+        view.addSubview(sliderContainerView)
+        self.sliderContainerView = sliderContainerView
+
+        let slider = UISlider()
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.minimumValue = 2
+        slider.maximumValue = 15
+        slider.value = Float(photoEditModel.focusBlurRadius)
+        slider.continuous = true
+        slider.setThumbImage(UIImage(named: "slider_knob", inBundle: NSBundle(forClass: FocusToolController.self), compatibleWithTraitCollection: nil), forState: .Normal)
+        sliderContainerView.addSubview(slider)
+        slider.addTarget(self, action: "changeValue:", forControlEvents: .ValueChanged)
+        self.slider = slider
+
         view.setNeedsUpdateConstraints()
     }
 
@@ -143,6 +164,22 @@ import UIKit
             NSLayoutConstraint.activateConstraints(constraints)
             gradientViewConstraints = constraints
         }
+
+        if let sliderContainerView = sliderContainerView, slider = slider where sliderConstraints == nil {
+            var constraints = [NSLayoutConstraint]()
+
+            constraints.append(NSLayoutConstraint(item: sliderContainerView, attribute: .Left, relatedBy: .Equal, toItem: view, attribute: .Left, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: sliderContainerView, attribute: .Right, relatedBy: .Equal, toItem: view, attribute: .Right, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: sliderContainerView, attribute: .Bottom, relatedBy: .Equal, toItem: view, attribute: .Bottom, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: sliderContainerView, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .NotAnAttribute, multiplier: 1, constant: 44))
+
+            constraints.append(NSLayoutConstraint(item: slider, attribute: .CenterY, relatedBy: .Equal, toItem: sliderContainerView, attribute: .CenterY, multiplier: 1, constant: 0))
+            constraints.append(NSLayoutConstraint(item: slider, attribute: .Left, relatedBy: .Equal, toItem: sliderContainerView, attribute: .Left, multiplier: 1, constant: 20))
+            constraints.append(NSLayoutConstraint(item: slider, attribute: .Right, relatedBy: .Equal, toItem: sliderContainerView, attribute: .Right, multiplier: 1, constant: -20))
+
+            NSLayoutConstraint.activateConstraints(constraints)
+            sliderConstraints = constraints
+        }
     }
 
     public override func viewDidLayoutSubviews() {
@@ -153,6 +190,12 @@ import UIKit
     }
 
     // MARK: - Actions
+
+    @objc private func changeValue(sender: UISlider) {
+        photoEditModel.performChangesWithBlock {
+            self.photoEditModel.focusBlurRadius = CGFloat(sender.value)
+        }
+    }
 
     @objc private func apply(sender: UIButton) {
         delegate?.photoEditToolControllerDidFinish(self)
@@ -207,16 +250,28 @@ extension FocusToolController: UICollectionViewDelegate {
         if indexPath.item == IMGLYFocusType.Off.rawValue {
             activeFocusType = .Off
             photoEditModel.focusType = .Off
+
+            UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
+                self.sliderContainerView?.alpha = 0
+                }, completion: nil)
         } else if indexPath.item == IMGLYFocusType.Linear.rawValue {
             activeFocusType = .Linear
             photoEditModel.focusType = .Linear
             photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(boxGradientView?.controlPoint1 ?? CGPoint.zero))
             photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(boxGradientView?.controlPoint2 ?? CGPoint.zero))
+
+            UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
+                self.sliderContainerView?.alpha = 1
+                }, completion: nil)
         } else if indexPath.item == IMGLYFocusType.Radial.rawValue {
             activeFocusType = .Radial
             photoEditModel.focusType = .Radial
             photoEditModel.focusNormalizedControlPoint1 = flipNormalizedPointVertically(normalizeControlPoint(circleGradientView?.controlPoint1 ?? CGPoint.zero))
             photoEditModel.focusNormalizedControlPoint2 = flipNormalizedPointVertically(normalizeControlPoint(circleGradientView?.controlPoint2 ?? CGPoint.zero))
+
+            UIView.animateWithDuration(0.25, delay: 0, options: [.CurveEaseInOut], animations: {
+                self.sliderContainerView?.alpha = 1
+                }, completion: nil)
         }
     }
 }

@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic) CGFloat effectFilterIntensity;
 @property(nonatomic) CGPoint focusNormalizedControlPoint1;
 @property(nonatomic) CGPoint focusNormalizedControlPoint2;
-@property(nonatomic) CGFloat focusRadius;
+@property(nonatomic) CGFloat focusBlurRadius;
 @property(nonatomic) IMGLYFocusType focusType;
 @property(nonatomic) CGRect normalizedCropRect;
 @property(nonatomic) CGFloat saturation;

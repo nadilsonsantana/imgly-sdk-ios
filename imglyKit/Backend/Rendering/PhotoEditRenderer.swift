@@ -116,7 +116,7 @@ import CoreImage
                 linearFocusFilter.inputImage = editedImage
                 linearFocusFilter.inputNormalizedControlPoint1 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint1)
                 linearFocusFilter.inputNormalizedControlPoint2 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint2)
-                linearFocusFilter.inputRadius = photoEditModel.focusRadius
+                linearFocusFilter.inputRadius = photoEditModel.focusBlurRadius
 
                 if let outputImage = linearFocusFilter.outputImage {
                     editedImage = outputImage
@@ -128,7 +128,7 @@ import CoreImage
                 radialFocusFilter.inputImage = editedImage
                 radialFocusFilter.inputNormalizedControlPoint1 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint1)
                 radialFocusFilter.inputNormalizedControlPoint2 = NSValue(CGPoint: photoEditModel.focusNormalizedControlPoint2)
-                radialFocusFilter.inputRadius = photoEditModel.focusRadius
+                radialFocusFilter.inputRadius = photoEditModel.focusBlurRadius
 
                 if let outputImage = radialFocusFilter.outputImage {
                     editedImage = outputImage

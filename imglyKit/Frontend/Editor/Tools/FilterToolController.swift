@@ -78,8 +78,8 @@ import UIKit
         let slider = UISlider()
         slider.translatesAutoresizingMaskIntoConstraints = false
         slider.minimumValue = 0
-        slider.value = Float(photoEditModel.effectFilterIntensity)
         slider.maximumValue = 1
+        slider.value = Float(photoEditModel.effectFilterIntensity)
         slider.continuous = true
         slider.setThumbImage(UIImage(named: "slider_knob", inBundle: NSBundle(forClass: AdjustToolController.self), compatibleWithTraitCollection: nil), forState: .Normal)
         sliderContainerView.addSubview(slider)

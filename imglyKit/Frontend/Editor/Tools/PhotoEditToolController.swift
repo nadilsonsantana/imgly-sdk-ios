@@ -26,9 +26,13 @@ import UIKit
     /// The render mode that the preview image should be rendered with when this tool is active.
     public var preferredRenderMode: IMGLYRenderMode
 
-    let photoEditModel: IMGLYPhotoEditMutableModel
+    /// The photo edit model that must be updated.
+    public let photoEditModel: IMGLYPhotoEditMutableModel
+
     @NSCopying internal var uneditedPhotoEditModel: IMGLYPhotoEditModel
-    private let configuration: Configuration
+
+    /// The configuration object that configures this tool.
+    public let configuration: Configuration
 
     weak var delegate: PhotoEditToolControllerDelegate?
 

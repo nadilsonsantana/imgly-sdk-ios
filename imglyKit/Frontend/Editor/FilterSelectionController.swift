@@ -40,7 +40,6 @@ public typealias PhotoEffectActiveBlock = () -> (PhotoEffect?)
         flowLayout.itemSize = FilterSelectionController.FilterCollectionViewCellSize
         flowLayout.scrollDirection = .Horizontal
         flowLayout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-        flowLayout.minimumInteritemSpacing = 7
         flowLayout.minimumLineSpacing = 7
 
         collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: flowLayout)

@@ -39,23 +39,6 @@ import UIKit
         return configuration.stickersEditorViewControllerOptions
     }
 
-    private var clipView = UIView()
-
-    public var selectedSticker: UIImageView? {
-        didSet {
-            oldValue?.layer.borderWidth = 0
-            oldValue?.layer.shadowOffset = CGSize.zero
-            oldValue?.layer.shadowColor = UIColor.clearColor().CGColor
-
-            selectedSticker?.layer.borderWidth = 2
-            selectedSticker?.layer.borderColor = UIColor.whiteColor().CGColor
-            selectedSticker?.layer.shadowOffset = CGSize(width: 0, height: 2)
-            selectedSticker?.layer.shadowRadius = 2
-            selectedSticker?.layer.shadowOpacity = 0.12
-            selectedSticker?.layer.shadowColor = UIColor.blackColor().CGColor
-        }
-    }
-
     // MARK: - UIViewController
 
     /**
@@ -71,21 +54,6 @@ import UIKit
             toolStackItem.titleLabel?.text = Localize("STICKER")
             toolStackItem.applyButton?.addTarget(self, action: "apply:", forControlEvents: .TouchUpInside)
             toolStackItem.discardButton = nil
-        }
-
-        clipView.backgroundColor = UIColor.clearColor()
-        clipView.clipsToBounds = true
-        view.addSubview(clipView)
-    }
-
-    /**
-    :nodoc:
-    */
-    public override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-
-        if let previewView = delegate?.photoEditToolControllerPreviewView(self) {
-            clipView.frame = view.convertRect(previewView.bounds, fromView: previewView)
         }
     }
 
@@ -126,11 +94,15 @@ extension StickerToolController: UICollectionViewDelegate {
     public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
         collectionView.deselectItemAtIndexPath(indexPath, animated: true)
 
+        guard let previewView = delegate?.photoEditToolControllerPreviewView(self) else {
+            return
+        }
+
         let sticker = options.stickersDataSource.stickerAtIndex(indexPath.item)
         let imageView = StickerImageView(image: sticker.image)
 
         // One third of the size of the photo's smaller side should be the size of the sticker's longest side
-        let longestStickerSide = min(clipView.bounds.width, clipView.bounds.height) * 0.33
+        let longestStickerSide = min(previewView.bounds.width, previewView.bounds.height) * 0.33
         let stickerSize: CGSize
 
         if sticker.image.size.width < sticker.image.size.height {
@@ -140,7 +112,7 @@ extension StickerToolController: UICollectionViewDelegate {
         }
 
         imageView.frame.size = stickerSize
-        imageView.center = CGPoint(x: clipView.bounds.midX, y: clipView.bounds.midY)
+        imageView.center = CGPoint(x: previewView.bounds.midX, y: previewView.bounds.midY)
 
         if let label = sticker.label {
             imageView.accessibilityLabel = Localize(label)
@@ -173,16 +145,13 @@ extension StickerToolController: UICollectionViewDelegate {
 
         imageView.transform = CGAffineTransformMakeScale(0, 0)
 
-        clipView.addSubview(imageView)
+        previewView.addSubview(imageView)
         imageView.transform = CGAffineTransformMakeScale(0, 0)
 
         UIView.animateWithDuration(0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: { () -> Void in
             imageView.transform = CGAffineTransformIdentity
         }) { _ in
-            self.selectedSticker = imageView
-//            self.selectedView = imageView
-//            self.selectView(imageView)
-//            self.updateButtonStatus()
+            self.delegate?.photoEditToolController(self, didAddOverlayView: imageView)
 
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, imageView)
         }

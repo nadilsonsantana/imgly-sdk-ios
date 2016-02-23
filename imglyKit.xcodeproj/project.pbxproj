@@ -112,6 +112,7 @@
 		2B4509A51C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */; };
 		2B4509A61C6B9B6F00DCB516 /* PhotoEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */; };
 		2B480D1D1C7323E300C2E9BC /* ToolStackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B480D1C1C7323E300C2E9BC /* ToolStackController.swift */; };
+		2B510F0A1C7CA3E000840D03 /* StickerOptionsToolController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B510F091C7CA3E000840D03 /* StickerOptionsToolController.swift */; };
 		2B54ED841C7628AD00F6855E /* IconCaptionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54ED831C7628AD00F6855E /* IconCaptionCollectionViewCell.swift */; };
 		2B54ED861C7628B700F6855E /* LabelCaptionCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54ED851C7628B700F6855E /* LabelCaptionCollectionViewCell.swift */; };
 		2B54ED881C7628CA00F6855E /* IconCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B54ED871C7628CA00F6855E /* IconCollectionViewCell.swift */; };
@@ -437,6 +438,7 @@
 		2B4468DD1C6C9D5E00A2626B /* CGSizeExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGSizeExtension.swift; sourceTree = "<group>"; };
 		2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEffect.swift; sourceTree = "<group>"; };
 		2B480D1C1C7323E300C2E9BC /* ToolStackController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToolStackController.swift; sourceTree = "<group>"; };
+		2B510F091C7CA3E000840D03 /* StickerOptionsToolController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StickerOptionsToolController.swift; sourceTree = "<group>"; };
 		2B54ED831C7628AD00F6855E /* IconCaptionCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconCaptionCollectionViewCell.swift; sourceTree = "<group>"; };
 		2B54ED851C7628B700F6855E /* LabelCaptionCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelCaptionCollectionViewCell.swift; sourceTree = "<group>"; };
 		2B54ED871C7628CA00F6855E /* IconCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IconCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -850,6 +852,7 @@
 				2B2E95E51C75D4F200DE8812 /* FrameToolController.swift */,
 				2B2E95DD1C75D4A900DE8812 /* OrientationToolController.swift */,
 				2B4468DB1C6C894600A2626B /* PhotoEditToolController.swift */,
+				2B510F091C7CA3E000840D03 /* StickerOptionsToolController.swift */,
 				2B2E95E11C75D4D800DE8812 /* StickerToolController.swift */,
 				2B2E95DF1C75D4CE00DE8812 /* TextToolController.swift */,
 			);
@@ -1671,6 +1674,7 @@
 				2B6D88F61C452B9900200557 /* DeviceOrientationController.swift in Sources */,
 				2B2E95DE1C75D4A900DE8812 /* OrientationToolController.swift in Sources */,
 				2B54ED881C7628CA00F6855E /* IconCollectionViewCell.swift in Sources */,
+				2B510F0A1C7CA3E000840D03 /* StickerOptionsToolController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

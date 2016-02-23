@@ -11,8 +11,10 @@ import UIKit
 @objc(IMGLYPhotoEditToolControllerDelegate) public protocol PhotoEditToolControllerDelegate {
     func photoEditToolControllerBaseImage(photoEditToolController: PhotoEditToolController) -> UIImage?
     func photoEditToolControllerPreviewView(photoEditToolController: PhotoEditToolController) -> UIView?
+    func photoEditToolControllerSelectedOverlayView(photoEditToolController: PhotoEditToolController) -> UIView?
     func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController)
     func photoEditToolController(photoEditToolController: PhotoEditToolController, didDiscardChangesInFavorOfPhotoEditModel photoEditModel: IMGLYPhotoEditModel)
+    func photoEditToolController(photoEditToolController: PhotoEditToolController, didAddOverlayView view: UIView)
 }
 
 /**
@@ -107,6 +109,10 @@ import UIKit
     /// is hidden and you are responsible for displaying the image.
     public var wantsDefaultPreviewView: Bool {
         return true
+    }
+
+    public var wantsScrollingInDefaultPreviewViewEnabled: Bool {
+        return false
     }
 
     /// The background color that should be used when this tool is active.

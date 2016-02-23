@@ -21,10 +21,10 @@ import GLKit
 
     // MARK: - Statics
 
-    static let IconCaptionCollectionViewCellReuseIdentifier = "IconCaptionCollectionViewCellReuseIdentifier"
-    static let SeparatorCollectionViewCellReuseIdentifier = "SeparatorCollectionViewCellReuseIdentifier"
-    static let ButtonCollectionViewCellSize = CGSize(width: 64, height: 80)
-    static let SeparatorCollectionViewCellSize = CGSize(width: 15, height: 80)
+    private static let IconCaptionCollectionViewCellReuseIdentifier = "IconCaptionCollectionViewCellReuseIdentifier"
+    private static let SeparatorCollectionViewCellReuseIdentifier = "SeparatorCollectionViewCellReuseIdentifier"
+    private static let ButtonCollectionViewCellSize = CGSize(width: 64, height: 80)
+    private static let SeparatorCollectionViewCellSize = CGSize(width: 15, height: 80)
 
     // MARK: - View Properties
 
@@ -32,6 +32,11 @@ import GLKit
     private var previewViewScrollingContainer: UIScrollView?
     private var mainPreviewView: GLKView?
     private var placeholderImageView: UIImageView?
+
+    private var tapGestureRecognizer: UITapGestureRecognizer?
+    private var panGestureRecognizer: UIPanGestureRecognizer?
+    private var pinchGestureRecognizer: UIPinchGestureRecognizer?
+    private var rotationGestureRecognizer: UIRotationGestureRecognizer?
 
     // MARK: - Constraint Properties
 
@@ -122,6 +127,23 @@ import GLKit
 
     private var toolForAction: [MainEditorActionType: PhotoEditToolController]?
 
+    private var selectedOverlayView: UIView? {
+        didSet {
+            oldValue?.layer.borderWidth = 0
+            oldValue?.layer.shadowOffset = CGSize.zero
+            oldValue?.layer.shadowColor = UIColor.clearColor().CGColor
+
+            selectedOverlayView?.layer.borderWidth = 2
+            selectedOverlayView?.layer.borderColor = UIColor.whiteColor().CGColor
+            selectedOverlayView?.layer.shadowOffset = CGSize(width: 0, height: 2)
+            selectedOverlayView?.layer.shadowRadius = 2
+            selectedOverlayView?.layer.shadowOpacity = 0.12
+            selectedOverlayView?.layer.shadowColor = UIColor.blackColor().CGColor
+        }
+    }
+
+    private var draggedOverlayView: UIView?
+
     // MARK: - Other Properties
 
     weak var delegate: PhotoEditViewControllerDelegate?
@@ -192,6 +214,7 @@ import GLKit
         let context = EAGLContext(API: .OpenGLES2)
         mainPreviewView = GLKView(frame: CGRect.zero, context: context)
         mainPreviewView!.delegate = self
+        mainPreviewView!.clipsToBounds = true
         previewViewScrollingContainer!.addSubview(mainPreviewView!)
 
         view.setNeedsUpdateConstraints()
@@ -205,6 +228,7 @@ import GLKit
 
         loadPhotoEditModelIfNecessary()
         loadToolsIfNeeded()
+        installGestureRecognizersIfNeeded()
         updateToolStackItem()
         updateBackgroundColor()
         updatePlaceholderImage()
@@ -272,6 +296,14 @@ import GLKit
         view.layoutIfNeeded()
         updateScrollViewContentSize()
         updateBackgroundColor()
+
+        if let currentEditingTool = delegate?.photoEditViewControllerCurrentEditingTool(self) {
+            previewViewScrollingContainer?.panGestureRecognizer.enabled = currentEditingTool.wantsScrollingInDefaultPreviewViewEnabled
+            previewViewScrollingContainer?.pinchGestureRecognizer?.enabled = currentEditingTool.wantsScrollingInDefaultPreviewViewEnabled
+        } else {
+            previewViewScrollingContainer?.panGestureRecognizer.enabled = true
+            previewViewScrollingContainer?.pinchGestureRecognizer?.enabled = true
+        }
     }
 
     private func loadPhotoEditModelIfNecessary() {
@@ -289,6 +321,35 @@ import GLKit
             loadBaseImageIfNecessary()
             photoEditModel = editModel
             uneditedPhotoEditModel = editModel
+        }
+    }
+
+    private func installGestureRecognizersIfNeeded() {
+        if tapGestureRecognizer == nil {
+            let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: "handleTap:")
+            view.addGestureRecognizer(tapGestureRecognizer)
+            self.tapGestureRecognizer = tapGestureRecognizer
+        }
+
+        if panGestureRecognizer == nil {
+            let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: "handlePan:")
+            panGestureRecognizer.delegate = self
+            view.addGestureRecognizer(panGestureRecognizer)
+            self.panGestureRecognizer = panGestureRecognizer
+        }
+
+        if pinchGestureRecognizer == nil {
+            let pinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: "handlePinch:")
+            pinchGestureRecognizer.delegate = self
+            view.addGestureRecognizer(pinchGestureRecognizer)
+            self.pinchGestureRecognizer = pinchGestureRecognizer
+        }
+
+        if rotationGestureRecognizer == nil {
+            let rotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: "handleRotation:")
+            rotationGestureRecognizer.delegate = self
+            view.addGestureRecognizer(rotationGestureRecognizer)
+            self.rotationGestureRecognizer = rotationGestureRecognizer
         }
     }
 
@@ -572,6 +633,140 @@ import GLKit
 
         delegate?.photoEditViewControllerDidCancel(self)
     }
+
+    // MARK: - Gesture Handling
+
+    private func showOptionsForStickerIfNeeded(stickerImageView: StickerImageView) {
+        guard let photoEditModel = photoEditModel else {
+            return
+        }
+
+        if !(delegate?.photoEditViewControllerCurrentEditingTool(self) is StickerOptionsToolController) {
+            let stickerOptionsToolController = StickerOptionsToolController(photoEditModel: photoEditModel, configuration: configuration)
+            stickerOptionsToolController.delegate = self
+            delegate?.photoEditViewController(self, didSelectToolController: stickerOptionsToolController)
+        }
+    }
+
+    private func showOptionsForTextIfNeeded(label: UILabel) {
+        guard let photoEditModel = photoEditModel else {
+            return
+        }
+
+        // TODO
+    }
+
+    @objc private func handleTap(gestureRecognizer: UITapGestureRecognizer) {
+        let view = gestureRecognizer.view
+        let location = gestureRecognizer.locationInView(view)
+        let target = view?.hitTest(location, withEvent: nil)
+
+        if let target = target as? StickerImageView {
+            selectedOverlayView = target
+            showOptionsForStickerIfNeeded(target)
+        } else if let target = target as? UILabel {
+            selectedOverlayView = target
+            showOptionsForTextIfNeeded(target)
+        } else {
+            selectedOverlayView = nil
+            delegate?.photoEditViewControllerPopToolController(self)
+        }
+    }
+
+    @objc private func handlePan(gestureRecognizer: UIPanGestureRecognizer) {
+        guard let mainPreviewView = mainPreviewView else {
+            return
+        }
+
+        let location = gestureRecognizer.locationInView(mainPreviewView)
+        let translation = gestureRecognizer.translationInView(mainPreviewView)
+
+        let targetView = mainPreviewView.hitTest(location, withEvent: nil)
+
+        switch gestureRecognizer.state {
+        case .Began:
+            if targetView is StickerImageView {
+                draggedOverlayView = targetView
+                selectedOverlayView = targetView
+            }
+        case .Changed:
+            if let draggedOverlayView = draggedOverlayView {
+                draggedOverlayView.center = draggedOverlayView.center + translation
+            }
+
+            gestureRecognizer.setTranslation(CGPoint.zero, inView: mainPreviewView)
+        case .Cancelled, .Ended:
+            draggedOverlayView = nil
+        default:
+            break
+        }
+    }
+
+    @objc private func handlePinch(gestureRecognizer: UIPinchGestureRecognizer) {
+        guard let mainPreviewView = mainPreviewView else {
+            return
+        }
+
+        if gestureRecognizer.numberOfTouches() >= 2 {
+            let point1 = gestureRecognizer.locationOfTouch(0, inView: mainPreviewView)
+            let point2 = gestureRecognizer.locationOfTouch(1, inView: mainPreviewView)
+            let midPoint = point1 + CGVector(startPoint: point1, endPoint: point2) * 0.5
+            let scale = gestureRecognizer.scale
+
+            let targetView = mainPreviewView.hitTest(midPoint, withEvent: nil)
+
+            switch gestureRecognizer.state {
+            case .Began:
+                if targetView is StickerImageView {
+                    draggedOverlayView = targetView
+                    selectedOverlayView = targetView
+                }
+            case .Changed:
+                if let draggedOverlayView = draggedOverlayView {
+                    draggedOverlayView.transform = CGAffineTransformScale(draggedOverlayView.transform, scale, scale)
+                }
+
+                gestureRecognizer.scale = 1
+            case .Cancelled, .Ended:
+                draggedOverlayView = nil
+            default:
+                break
+            }
+        }
+    }
+
+    @objc private func handleRotation(gestureRecognizer: UIRotationGestureRecognizer) {
+        guard let mainPreviewView = mainPreviewView else {
+            return
+        }
+
+        if gestureRecognizer.numberOfTouches() >= 2 {
+            let point1 = gestureRecognizer.locationOfTouch(0, inView: mainPreviewView)
+            let point2 = gestureRecognizer.locationOfTouch(1, inView: mainPreviewView)
+            let midPoint = point1 + CGVector(startPoint: point1, endPoint: point2) * 0.5
+            let rotation = gestureRecognizer.rotation
+
+            let targetView = mainPreviewView.hitTest(midPoint, withEvent: nil)
+
+            switch gestureRecognizer.state {
+            case .Began:
+                if targetView is StickerImageView {
+                    draggedOverlayView = targetView
+                    selectedOverlayView = targetView
+                }
+            case .Changed:
+                if let draggedOverlayView = draggedOverlayView {
+                    draggedOverlayView.transform = CGAffineTransformRotate(draggedOverlayView.transform, rotation)
+                }
+
+                gestureRecognizer.rotation = 0
+            case .Cancelled, .Ended:
+                draggedOverlayView = nil
+            default:
+                break
+            }
+        }
+    }
 }
 
 extension PhotoEditViewController: GLKViewDelegate {
@@ -783,11 +978,53 @@ extension PhotoEditViewController: PhotoEditToolControllerDelegate {
     }
 
     public func photoEditToolControllerDidFinish(photoEditToolController: PhotoEditToolController) {
+        selectedOverlayView = nil
         delegate?.photoEditViewControllerPopToolController(self)
     }
 
     public func photoEditToolController(photoEditToolController: PhotoEditToolController, didDiscardChangesInFavorOfPhotoEditModel photoEditModel: IMGLYPhotoEditModel) {
+        selectedOverlayView = nil
         self.photoEditModel?.copyValuesFromModel(photoEditModel)
         delegate?.photoEditViewControllerPopToolController(self)
+    }
+
+    public func photoEditToolController(photoEditToolController: PhotoEditToolController, didAddOverlayView view: UIView) {
+        selectedOverlayView = view
+
+        if let view = view as? StickerImageView {
+            showOptionsForStickerIfNeeded(view)
+        } else if let view = view as? UILabel {
+            showOptionsForTextIfNeeded(view)
+        }
+    }
+
+    public func photoEditToolControllerSelectedOverlayView(photoEditToolController: PhotoEditToolController) -> UIView? {
+        return selectedOverlayView
+    }
+}
+
+extension PhotoEditViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == pinchGestureRecognizer && otherGestureRecognizer == rotationGestureRecognizer || gestureRecognizer == rotationGestureRecognizer && otherGestureRecognizer == pinchGestureRecognizer {
+            return true
+        }
+
+        return false
+    }
+
+    public func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == panGestureRecognizer || gestureRecognizer == pinchGestureRecognizer || gestureRecognizer == rotationGestureRecognizer {
+            guard let currentEditingTool = delegate?.photoEditViewControllerCurrentEditingTool(self) else {
+                return false
+            }
+
+            if currentEditingTool is StickerOptionsToolController {
+                return true
+            }
+
+            return false
+        }
+
+        return true
     }
 }

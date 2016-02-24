@@ -100,18 +100,12 @@ extension StickerToolController: UICollectionViewDelegate {
 
         let sticker = options.stickersDataSource.stickerAtIndex(indexPath.item)
         let imageView = StickerImageView(image: sticker.image)
+        imageView.sizeToFit()
 
         // One third of the size of the photo's smaller side should be the size of the sticker's longest side
         let longestStickerSide = min(previewView.bounds.width, previewView.bounds.height) * 0.33
-        let stickerSize: CGSize
+        let initialStickerScale = longestStickerSide / max(sticker.image.size.height, sticker.image.size.width)
 
-        if sticker.image.size.width < sticker.image.size.height {
-            stickerSize = CGSize(width: longestStickerSide * (sticker.image.size.width / sticker.image.size.height), height: longestStickerSide)
-        } else {
-            stickerSize = CGSize(width: longestStickerSide, height: longestStickerSide * (sticker.image.size.height / sticker.image.size.width))
-        }
-
-        imageView.frame.size = stickerSize
         imageView.center = CGPoint(x: previewView.bounds.midX, y: previewView.bounds.midY)
 
         if let label = sticker.label {
@@ -144,12 +138,10 @@ extension StickerToolController: UICollectionViewDelegate {
         }
 
         imageView.transform = CGAffineTransformMakeScale(0, 0)
-
         previewView.addSubview(imageView)
-        imageView.transform = CGAffineTransformMakeScale(0, 0)
 
         UIView.animateWithDuration(0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: [], animations: { () -> Void in
-            imageView.transform = CGAffineTransformIdentity
+            imageView.transform = CGAffineTransformMakeScale(initialStickerScale, initialStickerScale)
         }) { _ in
             self.delegate?.photoEditToolController(self, didAddOverlayView: imageView)
 

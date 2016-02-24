@@ -133,12 +133,14 @@ import GLKit
             oldValue?.layer.shadowOffset = CGSize.zero
             oldValue?.layer.shadowColor = UIColor.clearColor().CGColor
 
-            selectedOverlayView?.layer.borderWidth = 2
-            selectedOverlayView?.layer.borderColor = UIColor.whiteColor().CGColor
-            selectedOverlayView?.layer.shadowOffset = CGSize(width: 0, height: 2)
-            selectedOverlayView?.layer.shadowRadius = 2
-            selectedOverlayView?.layer.shadowOpacity = 0.12
-            selectedOverlayView?.layer.shadowColor = UIColor.blackColor().CGColor
+            if let selectedOverlayView = selectedOverlayView {
+                selectedOverlayView.layer.borderWidth = 2 / (0.5 * (selectedOverlayView.transform.xScale + selectedOverlayView.transform.yScale))
+                selectedOverlayView.layer.borderColor = UIColor.whiteColor().CGColor
+                selectedOverlayView.layer.shadowOffset = CGSize(width: 0, height: 2)
+                selectedOverlayView.layer.shadowRadius = 2
+                selectedOverlayView.layer.shadowOpacity = 0.12
+                selectedOverlayView.layer.shadowColor = UIColor.blackColor().CGColor
+            }
         }
     }
 
@@ -724,6 +726,10 @@ import GLKit
             case .Changed:
                 if let draggedOverlayView = draggedOverlayView {
                     draggedOverlayView.transform = CGAffineTransformScale(draggedOverlayView.transform, scale, scale)
+
+                    if let selectedOverlayView = selectedOverlayView {
+                        selectedOverlayView.layer.borderWidth = 2 / (0.5 * (draggedOverlayView.transform.xScale + draggedOverlayView.transform.yScale))
+                    }
                 }
 
                 gestureRecognizer.scale = 1

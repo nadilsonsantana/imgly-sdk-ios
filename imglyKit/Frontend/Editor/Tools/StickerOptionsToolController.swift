@@ -144,7 +144,7 @@ extension StickerOptionsToolController: UICollectionViewDataSource {
                 iconCaptionCell.captionLabel.text = Localize("Delete")
             }
         }
-        
+
         return cell
     }
 }

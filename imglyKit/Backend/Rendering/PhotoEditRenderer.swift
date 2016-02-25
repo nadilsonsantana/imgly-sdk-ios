@@ -187,6 +187,46 @@ import CoreImage
             }
         }
 
+        // Overlays
+        if renderMode.contains(.Overlays) {
+            let inputImageRect = originalImage.extent
+            let inputImageSize = inputImageRect.size
+
+            if let overlays = photoEditModel.overlays as? [Overlay] {
+                for overlay in overlays {
+                    let overlayCenter = CGPoint(x: overlay.normalizedCenter.x * inputImageSize.width, y: overlay.normalizedCenter.y * inputImageSize.height)
+                    let overlaySize = overlay.image.extent
+
+                    var transform = CGAffineTransformIdentity
+
+                    // Translate
+                    // Calculate the origin of the sticker. Note that in CoreImage (0,0) is at the bottom
+                    let overlayOrigin = CGPoint(x: overlayCenter.x - overlaySize.width * overlay.xScale / 2, y: overlayCenter.y + overlaySize.height * overlay.yScale / 2)
+                    transform = CGAffineTransformTranslate(transform, overlayOrigin.x, inputImageSize.height - overlayOrigin.y)
+
+                    // Scale
+                    transform = CGAffineTransformScale(transform, overlay.xScale, overlay.yScale)
+
+                    // Rotate
+                    transform = CGAffineTransformTranslate(transform, 0.5 * overlaySize.width, 0.5 * overlaySize.height)
+                    transform = CGAffineTransformRotate(transform, -1 * overlay.rotation)
+                    transform = CGAffineTransformTranslate(transform, -0.5 * overlaySize.width, -0.5 * overlaySize.height)
+
+                    var overlayImage = overlay.image.imageByApplyingTransform(transform)
+                    overlayImage = overlayImage.imageByCroppingToRect(inputImageRect)
+
+                    if let filter = CIFilter(name: "CISourceOverCompositing") {
+                        filter.setValue(editedImage, forKey: kCIInputBackgroundImageKey)
+                        filter.setValue(overlayImage, forKey: kCIInputImageKey)
+
+                        if let outputImage = filter.outputImage {
+                            editedImage = outputImage
+                        }
+                    }
+                }
+            }
+        }
+
         // Cache image
         cachedOutputImage = editedImage
 

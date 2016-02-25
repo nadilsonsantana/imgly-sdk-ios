@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic) CGFloat focusBlurRadius;
 @property(nonatomic) IMGLYFocusType focusType;
 @property(nonatomic) CGRect normalizedCropRect;
+@property(nonatomic, copy) NSArray<IMGLYOverlay *> *overlays;
 @property(nonatomic) CGFloat saturation;
 @property(nonatomic) CGFloat straightenAngle;
 

@@ -9,8 +9,7 @@
 typedef NS_ENUM(NSInteger, IMGLYFocusType) { IMGLYFocusTypeOff, IMGLYFocusTypeLinear, IMGLYFocusTypeRadial };
 
 typedef NS_ENUM(NSInteger, IMGLYOrientation) {
-    IMGLYOrientationUnknown,
-    IMGLYOrientationNormal,
+    IMGLYOrientationNormal = 1,
     IMGLYOrientationFlipX,
     IMGLYOrientationRotate180,
     IMGLYOrientationFlipY,

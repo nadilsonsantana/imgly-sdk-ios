@@ -11,6 +11,8 @@
 
 #import "Enums.h"
 
+@class IMGLYOverlay;
+
 @interface IMGLYPhotoEditModel : NSObject <NSCopying> {
   @protected
     IMGLYOrientation _appliedOrientation;
@@ -24,6 +26,7 @@
     CGFloat _focusBlurRadius;
     IMGLYFocusType _focusType;
     CGRect _normalizedCropRect;
+    NSArray<IMGLYOverlay *> *_overlays;
     CGFloat _saturation;
     CGFloat _straightenAngle;
 }
@@ -86,6 +89,11 @@ NS_ASSUME_NONNULL_BEGIN
  *  The normalized crop rect of the image.
  */
 @property(nonatomic, readonly) CGRect normalizedCropRect;
+
+/**
+ *  The overlays that should be added to the image.
+ */
+@property(nonatomic, readonly, copy) NSArray<IMGLYOverlay *> *overlays;
 
 /**
  *  The saturation of the image.

@@ -13,6 +13,7 @@ typedef NS_OPTIONS(NSUInteger, IMGLYRenderMode) {
     IMGLYRenderModeFocus = 1 << 2,
     IMGLYRenderModePhotoEffect = 1 << 3,
     IMGLYRenderModeColorAdjustments = 1 << 4,
+    IMGLYRenderModeOverlays = 1 << 5,
     IMGLYRenderModeAll = IMGLYRenderModeAutoEnhancement | IMGLYRenderModeOrientationCrop | IMGLYRenderModeFocus |
-                         IMGLYRenderModePhotoEffect | IMGLYRenderModeColorAdjustments
+                         IMGLYRenderModePhotoEffect | IMGLYRenderModeColorAdjustments | IMGLYRenderModeOverlays
 };

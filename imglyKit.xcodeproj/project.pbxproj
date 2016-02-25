@@ -136,6 +136,8 @@
 		2B91DF071C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF031C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m */; };
 		2B91DF0A1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */; };
 		2B91DF0B1C68962A00B559D3 /* IMGLYOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */; };
+		2B93A2FF1C7DE83400D873FD /* ImageGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B93A2FE1C7DE83400D873FD /* ImageGeometry.swift */; };
+		2B93A3001C7DE83400D873FD /* ImageGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B93A2FE1C7DE83400D873FD /* ImageGeometry.swift */; };
 		2B948C361C5B6A0900094CAE /* CGAffineTransformExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */; };
 		2B9BC6441C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BC6431C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift */; };
 		2B9E15C71C774E1B00BA7462 /* 70s.png in Resources */ = {isa = PBXBuildFile; fileRef = 2B9E15891C774E1B00BA7462 /* 70s.png */; };
@@ -286,6 +288,8 @@
 		2BC5A5271C6A323600C03C82 /* PhotoEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BC5A5261C6A323600C03C82 /* PhotoEditViewController.swift */; };
 		2BE0C44F1C3ABB3B00F1F5E4 /* imglyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BF4D3841AF1139600C801B2 /* imglyKit.framework */; };
 		2BE0C4571C3ABBA900F1F5E4 /* LUTConverterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE0C4561C3ABBA900F1F5E4 /* LUTConverterTests.swift */; };
+		2BE189D91C7F007800FD6D8D /* Overlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE189D81C7F007800FD6D8D /* Overlay.swift */; };
+		2BE189DA1C7F007800FD6D8D /* Overlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE189D81C7F007800FD6D8D /* Overlay.swift */; };
 		2BE37B781B3D9978009FAD40 /* VideoRecordButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE37B771B3D9978009FAD40 /* VideoRecordButton.swift */; };
 		2BEBCE971B00D7D1000FE22B /* AnimationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BEBCE961B00D7D1000FE22B /* AnimationDelegate.swift */; };
 		2BEBFEAB1C3FEF6400FAA95C /* AVCaptureVideoOrientationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BEBFEAA1C3FEF6400FAA95C /* AVCaptureVideoOrientationExtension.swift */; };
@@ -457,6 +461,7 @@
 		2B91DF031C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMGLYPhotoEditMutableModel.m; sourceTree = "<group>"; };
 		2B91DF081C64FAD400B559D3 /* IMGLYPhotoEditModel+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IMGLYPhotoEditModel+Private.h"; sourceTree = "<group>"; };
 		2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IMGLYOrientation.swift; sourceTree = "<group>"; };
+		2B93A2FE1C7DE83400D873FD /* ImageGeometry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageGeometry.swift; sourceTree = "<group>"; };
 		2B948C341C5B6A0900094CAE /* CGAffineTransformExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGAffineTransformExtension.swift; sourceTree = "<group>"; };
 		2B9BC6431C7711E9005407E8 /* PhotoEffectThumbnailRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoEffectThumbnailRenderer.swift; sourceTree = "<group>"; };
 		2B9E15891C774E1B00BA7462 /* 70s.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 70s.png; sourceTree = "<group>"; };
@@ -544,6 +549,7 @@
 		2BE0C44E1C3ABB3B00F1F5E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2BE0C4561C3ABBA900F1F5E4 /* LUTConverterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LUTConverterTests.swift; sourceTree = "<group>"; };
 		2BE0C4581C3ABCEB00F1F5E4 /* imglyKit-Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "imglyKit-Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		2BE189D81C7F007800FD6D8D /* Overlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Overlay.swift; sourceTree = "<group>"; };
 		2BE37B771B3D9978009FAD40 /* VideoRecordButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoRecordButton.swift; sourceTree = "<group>"; };
 		2BEBCE961B00D7D1000FE22B /* AnimationDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AnimationDelegate.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		2BEBFEAA1C3FEF6400FAA95C /* AVCaptureVideoOrientationExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVCaptureVideoOrientationExtension.swift; sourceTree = "<group>"; };
@@ -810,6 +816,7 @@
 		2B9F75F01C68A33500E5723B /* Rendering */ = {
 			isa = PBXGroup;
 			children = (
+				2B93A2FE1C7DE83400D873FD /* ImageGeometry.swift */,
 				2B91DF091C68962A00B559D3 /* IMGLYOrientation.swift */,
 				2B91DEFC1C64EEC900B559D3 /* IMGLYPhotoEditModel.h */,
 				2B91DEFD1C64EEC900B559D3 /* IMGLYPhotoEditModel.m */,
@@ -817,6 +824,7 @@
 				2B91DF021C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.h */,
 				2B91DF031C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m */,
 				2B9F75F41C68AC4300E5723B /* IMGLYRenderMode.h */,
+				2BE189D81C7F007800FD6D8D /* Overlay.swift */,
 				2B9F75F11C68A38400E5723B /* PhotoEditRenderer.swift */,
 				2B4509A41C6B9B6F00DCB516 /* PhotoEffect.swift */,
 			);
@@ -1497,6 +1505,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				09204C2D1C7729980095F9F1 /* Border.swift in Sources */,
+				2BE189DA1C7F007800FD6D8D /* Overlay.swift in Sources */,
 				2B1ADA991B19C8E500C98522 /* TiltshiftFilter.swift in Sources */,
 				2B1ADA971B19C8E500C98522 /* StickerFilter.swift in Sources */,
 				2B1ADA901B19C8E100C98522 /* InstanceFactory.swift in Sources */,
@@ -1513,6 +1522,7 @@
 				2B91DF071C64EEDF00B559D3 /* IMGLYPhotoEditMutableModel.m in Sources */,
 				2B1AB23F1C79083A00998057 /* RadialFocusFilter.swift in Sources */,
 				2B1ADA921B19C8E500C98522 /* CropFilter.swift in Sources */,
+				2B93A3001C7DE83400D873FD /* ImageGeometry.swift in Sources */,
 				2B1ADAE41B19D0C800C98522 /* NSAffineTransformExtension.swift in Sources */,
 				2B1ADAE21B19CD5500C98522 /* NSImageExtension.swift in Sources */,
 				2B1ADA931B19C8E500C98522 /* EnhancementFilter.swift in Sources */,
@@ -1617,6 +1627,7 @@
 				2B1B9AF61C52625100C6D276 /* CGVectorExtension.swift in Sources */,
 				2B1ADA101B19C3F300C98522 /* InstanceFactoryExtension.swift in Sources */,
 				2B54ED861C7628B700F6855E /* LabelCaptionCollectionViewCell.swift in Sources */,
+				2B93A2FF1C7DE83400D873FD /* ImageGeometry.swift in Sources */,
 				2B9F75F21C68A38400E5723B /* PhotoEditRenderer.swift in Sources */,
 				2BF4D3EF1AF1151500C801B2 /* UIImageExtension.swift in Sources */,
 				09381E2A1C6CEEBA0057463E /* Border.swift in Sources */,
@@ -1638,6 +1649,7 @@
 				093D11231C60F99900B72B7A /* TextButton.swift in Sources */,
 				2B54ED841C7628AD00F6855E /* IconCaptionCollectionViewCell.swift in Sources */,
 				093D11211C60F90800B72B7A /* ZoomingImageView.swift in Sources */,
+				2BE189D91C7F007800FD6D8D /* Overlay.swift in Sources */,
 				2BF51DE41C722AEF00BFE25D /* FilterToolController.swift in Sources */,
 				2B1B04921C77937A00074A28 /* CGPointExtension.swift in Sources */,
 				2BFC627C1C720CC2006991D2 /* SeparatorCollectionViewCell.swift in Sources */,

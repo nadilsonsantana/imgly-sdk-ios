@@ -551,6 +551,35 @@ import GLKit
 
     // MARK: - Helpers
 
+    private func addOverlaysToPhotoEditModel(photoEditModel: IMGLYPhotoEditMutableModel, scaledBy scale: CGFloat) {
+        guard let mainPreviewView = mainPreviewView else {
+            return
+        }
+
+        photoEditModel.performChangesWithBlock {
+            for subview in mainPreviewView.subviews {
+                if let stickerImageView = subview as? StickerImageView {
+                    if let image = stickerImageView.image?.CGImage {
+                        let ciImage = CIImage(CGImage: image)
+                        let rotation = stickerImageView.transform.rotation
+                        let xScale = stickerImageView.transform.xScale * scale
+                        let yScale = stickerImageView.transform.yScale * scale
+                        let normalizedCenter = CGPoint(
+                            x: stickerImageView.center.x / mainPreviewView.bounds.size.width,
+                            y: stickerImageView.center.y / mainPreviewView.bounds.size.height
+                        )
+
+                        let overlay = Overlay(image: ciImage, rotation: rotation, xScale: xScale, yScale: yScale, normalizedCenter: normalizedCenter)
+
+                        photoEditModel.overlays = (photoEditModel.overlays as NSArray).arrayByAddingObject(overlay)
+                    }
+                } else if let label = subview as? UILabel {
+                    // TODO
+                }
+            }
+        }
+    }
+
     private func workImageSizeForScreen(screen: UIScreen) -> CGSize {
         let screenSize = screen.bounds.size
         let screenScale = screen.scale
@@ -605,12 +634,18 @@ import GLKit
     @objc private func save(sender: UIButton) {
         // Load photo from disc
         if let photoFileURL = photoFileURL, path = photoFileURL.path, photo = UIImage(contentsOfFile: path) {
-            if photoEditModel == uneditedPhotoEditModel {
+            if let mainPreviewView = mainPreviewView where photoEditModel == uneditedPhotoEditModel && mainPreviewView.subviews.count == 0 {
                 delegate?.photoEditViewController(self, didSaveImage: photo)
             } else if let cgImage = photo.CGImage {
                 let ciImage = CIImage(CGImage: cgImage)
                 let photoEditRenderer = PhotoEditRenderer()
-                photoEditRenderer.photoEditModel = photoEditModel
+                photoEditRenderer.photoEditModel = photoEditModel?.mutableCopy() as? IMGLYPhotoEditMutableModel
+
+                if let photoEditModel = photoEditRenderer.photoEditModel as? IMGLYPhotoEditMutableModel, mainPreviewView = mainPreviewView {
+                    let viewToPhotoScale = ciImage.extent.width / mainPreviewView.bounds.width
+                    addOverlaysToPhotoEditModel(photoEditModel, scaledBy: viewToPhotoScale)
+                }
+
                 photoEditRenderer.originalImage = ciImage
 
                 photoEditRenderer.createOutputImageWithCompletion { outputImage in

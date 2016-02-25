@@ -27,6 +27,7 @@
         _focusBlurRadius = 10;
         _focusType = IMGLYFocusTypeOff;
         _normalizedCropRect = [[self class] identityNormalizedCropRect];
+        _overlays = [NSArray new];
         _saturation = 1;
         _straightenAngle = 0;
     }
@@ -58,6 +59,7 @@
     _focusBlurRadius = photoEditModel.focusBlurRadius;
     _focusType = photoEditModel.focusType;
     _normalizedCropRect = photoEditModel.normalizedCropRect;
+    _overlays = photoEditModel.overlays.copy;
     _saturation = photoEditModel.saturation;
     _straightenAngle = photoEditModel.straightenAngle;
 }
@@ -125,6 +127,10 @@
     }
 
     if (!CGRectEqualToRect(photoEditModel.normalizedCropRect, self.normalizedCropRect)) {
+        return NO;
+    }
+
+    if (![photoEditModel.overlays isEqualToArray:self.overlays]) {
         return NO;
     }
 

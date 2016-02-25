@@ -30,6 +30,7 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
 @dynamic focusBlurRadius;
 @dynamic focusType;
 @dynamic normalizedCropRect;
+@dynamic overlays;
 @dynamic saturation;
 @dynamic straightenAngle;
 
@@ -141,6 +142,14 @@ NSString *const IMGLYPhotoEditModelDidChangeNotification = @"IMGLYPhotoEditModel
     if (!CGRectEqualToRect(_normalizedCropRect, normalizedCropRect)) {
         [self performChangesWithBlock:^{
           _normalizedCropRect = normalizedCropRect;
+        }];
+    }
+}
+
+- (void)setOverlays:(NSArray *)overlays {
+    if (![_overlays isEqualToArray:overlays]) {
+        [self performChangesWithBlock:^{
+            _overlays = overlays;
         }];
     }
 }

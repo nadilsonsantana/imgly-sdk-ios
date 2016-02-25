@@ -232,7 +232,7 @@ public typealias WillLeaveToolClosure = () -> ()
         builder(builderForClosure)
         borderEditorViewControllerOptions = BorderEditorViewControllerOptions(builder: builderForClosure)
     }
-    
+
     public func configureToolStackController(builder: (ToolStackControllerOptionsBuilder -> Void)) {
         let builderForClosure = ToolStackControllerOptionsBuilder()
         builder(builderForClosure)
